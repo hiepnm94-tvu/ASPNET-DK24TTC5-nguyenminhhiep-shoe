@@ -1,0 +1,36 @@
+@model quanlybangiay.Models.Category
+
+@{
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
+    ViewData["Title"] = "Sửa chuyên mục";
+}
+
+<div class="card mb-4">
+    <h2 class="card-header fw-bold py-3 mb-4">Sửa chuyên mục</h2>
+
+    <div class="card-body">
+        <form asp-area="Admin" asp-controller="Categories" asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="CategoryId" />
+            <div class="mb-3">
+                <label class="form-label">Tên chuyên mục</label>
+                <input asp-for="CategoryName" class="form-control" placeholder="Vui lòng nhập tên chuyên mục" required />
+                @Html.ValidationMessageFor(m => m.CategoryName, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Slug</label>
+                <input asp-for="Slug" class="form-control" placeholder="Vui lòng nhập slug" required />
+                @Html.ValidationMessageFor(m => m.Slug, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-check form-switch mb-2">
+                <input type="checkbox" class="form-check-input" asp-for="IsActiveChecked" />
+                <label class="form-check-label" asp-for="IsActiveChecked">Trạng thái</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-ad-save">Lưu</button>
+            <a asp-area="Admin" asp-controller="Categories" asp-action="Index" class="btn btn-outline-secondary btn-ad-cancel">Hủy</a>
+        </form>
+    </div>
+</div>
