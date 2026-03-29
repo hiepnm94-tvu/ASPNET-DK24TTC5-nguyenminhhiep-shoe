@@ -1,0 +1,22 @@
+@model quanlybangiay.Models.Category
+@{
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
+    ViewData["Title"] = "Chi tiết chuyên mục";
+}
+
+<h1>Chi tiết chuyên mục</h1>
+
+<div class="mb-3">
+    <label class="form-label">ID</label>
+    <div>@Model.CategoryId</div>
+</div>
+<div class="mb-3">
+    <label class="form-label">Tên</label>
+    <div>@Model.CategoryName</div>
+</div>
+<div class="mb-3">
+    <label class="form-label">Slug</label>
+    <div>@Model.Slug</div>
+</div>
+
+<a asp-area="Admin" asp-controller="Categories" asp-action="Index" class="btn btn-secondary">Quay lại</a>

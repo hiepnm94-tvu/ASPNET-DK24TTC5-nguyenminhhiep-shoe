@@ -5,9 +5,12 @@
 ## Các chức năng chính của site
 ### Quản trị
 <ol>
-  <li>Quản lý chuyên mục</li>
+  <li>Đăng nhập, Đăng xuất vào trang quản trị</li>
+  <li>Quản lý chuyên mục (Thêm, Sửa, Xóa)</li>
   <li>Quản lý sản phẩm</li>
   <li>Quản lý bài viết</li>
+  <li>Quản lý liên hệ</li>
+  <li>Quản lý khách hàng</li>
   <li>Quản lý đơn hàng</li>
 </ol>
 
