@@ -95,6 +95,12 @@ namespace quanlybangiay.Data
                 .WithMany()
                 .HasForeignKey(s => s.UpdatedBy)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Contact>()
+                .HasOne(c => c.UpdatedByUser)
+                .WithMany()
+                .HasForeignKey(c => c.UpdatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

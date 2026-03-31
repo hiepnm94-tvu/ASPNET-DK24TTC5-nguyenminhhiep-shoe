@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,12 @@ namespace quanlybangiay.Controllers.Admin
         public ContactsController(ApplicationDbContext db)
         {
             _db = db;
+        }
+
+        private int? GetCurrentUserId()
+        {
+            var val = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.TryParse(val, out var id) ? id : null;
         }
 
         public async Task<IActionResult> Index(int page = 1, int pageSize = 20)
@@ -53,6 +60,7 @@ namespace quanlybangiay.Controllers.Admin
 
             contact.IsActive = input.IsActive;
             contact.Note = input.Note;
+            contact.UpdatedBy = GetCurrentUserId();
 
             await _db.SaveChangesAsync();
             TempData["SuccessMessage"] = "Cập nhật liên hệ thành công!";
