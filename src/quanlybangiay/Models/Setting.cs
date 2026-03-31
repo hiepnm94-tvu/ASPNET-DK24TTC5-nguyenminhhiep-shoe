@@ -66,5 +66,15 @@ namespace quanlybangiay.Models
         public string? BannerUrl { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
+
+        public int? CreatedBy { get; set; }
+
+        public int? UpdatedBy { get; set; }
+
+        [ForeignKey("CreatedBy")]
+        public User? CreatedByUser { get; set; }
+
+        [ForeignKey("UpdatedBy")]
+        public User? UpdatedByUser { get; set; }
     }
 }

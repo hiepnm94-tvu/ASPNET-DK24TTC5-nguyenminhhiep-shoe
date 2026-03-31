@@ -60,10 +60,12 @@
                 <input asp-for="AvatarUrl" class="form-control" placeholder="Vui lòng nhập URL ảnh đại diện" />
             </div>
 
-            <div class="form-check form-switch mb-2">
-                <input type="hidden" name="IsActive" value="false" />
-                <input type="checkbox" class="form-check-input" id="IsActive" name="IsActive" value="true" checked />
-                <label class="form-check-label" for="IsActive">Trạng thái hoạt động</label>
+            <div class="mb-3">
+                <label class="form-label">Trạng thái</label>
+                <select name="IsActive" class="form-select">
+                    <option value="true" selected>Hoạt động</option>
+                    <option value="false">Không hoạt động</option>
+                </select>
             </div>
 
             <button type="submit" class="btn btn-primary btn-ad-save">Lưu</button>

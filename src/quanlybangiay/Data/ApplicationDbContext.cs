@@ -17,6 +17,7 @@ namespace quanlybangiay.Data
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Setting> Settings { get; set; }
+        public DbSet<Contact> Contacts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -70,6 +71,30 @@ namespace quanlybangiay.Data
                 .WithMany()
                 .HasForeignKey(p => p.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Post>()
+                .HasOne(p => p.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(p => p.CreatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Post>()
+                .HasOne(p => p.UpdatedByUser)
+                .WithMany()
+                .HasForeignKey(p => p.UpdatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Setting>()
+                .HasOne(s => s.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(s => s.CreatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Setting>()
+                .HasOne(s => s.UpdatedByUser)
+                .WithMany()
+                .HasForeignKey(s => s.UpdatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

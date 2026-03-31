@@ -1,0 +1,68 @@
+@model quanlybangiay.Models.Contact
+@{
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
+    ViewData["Title"] = "Xử lý liên hệ";
+}
+
+<div class="card mb-4">
+    <h2 class="card-header fw-bold py-3 mb-4">Xử lý liên hệ #@Model.ContactId</h2>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <table class="table table-borderless">
+                    <tr>
+                        <th class="text-muted" style="width:120px;">Họ tên</th>
+                        <td>@Model.FirstName @Model.LastName</td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">Email</th>
+                        <td><a href="mailto:@Model.Email">@(Model.Email ?? "—")</a></td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">IP</th>
+                        <td><code>@(Model.IP ?? "—")</code></td>
+                    </tr>
+                    <tr>
+                        <th class="text-muted">Ngày gửi</th>
+                        <td>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-muted">Chủ đề</label>
+                    <p class="fw-semibold">@(Model.Subject ?? "—")</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-muted">Nội dung</label>
+                    <div class="p-3 bg-light rounded" style="white-space:pre-wrap;">@(Model.Message ?? "—")</div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <form asp-area="Admin" asp-controller="Contacts" asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ContactId" />
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Trạng thái</label>
+                    <select name="IsActive" class="form-select">
+                        <option value="true" selected="@(Model.IsActive)">Chờ xử lý</option>
+                        <option value="false" selected="@(!Model.IsActive)">Đã xử lý</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Ghi chú Admin</label>
+                <textarea asp-for="Note" class="form-control" rows="4" placeholder="Nhập ghi chú xử lý..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-ad-save">Lưu</button>
+            <a asp-area="Admin" asp-controller="Contacts" asp-action="Index" class="btn btn-outline-secondary btn-ad-cancel">Hủy</a>
+        </form>
+    </div>
+</div>

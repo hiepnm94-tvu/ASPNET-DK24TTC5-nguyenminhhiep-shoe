@@ -30,11 +30,14 @@ namespace quanlybangiay.Models
 
         public DateTime? UpdatedAt { get; set; }
 
-        [NotMapped]
-        public bool IsActiveChecked
-        {
-            get { return IsActive ?? true; }
-            set { IsActive = value; }
-        }
+        public int? CreatedBy { get; set; }
+
+        public int? UpdatedBy { get; set; }
+
+        [ForeignKey("CreatedBy")]
+        public User? CreatedByUser { get; set; }
+
+        [ForeignKey("UpdatedBy")]
+        public User? UpdatedByUser { get; set; }
     }
 }

@@ -21,10 +21,12 @@
                 @Html.ValidationMessageFor(m => m.Slug, "", new { @class = "text-danger" })
             </div>
 
-            <div class="form-check form-switch mb-2">
-                <input type="hidden" name="IsActive" value="false" />
-                <input type="checkbox" class="form-check-input" id="IsActive" name="IsActive" value="true"/>
-                <label class="form-check-label" for="IsActive">Trạng thái</label>
+            <div class="mb-3">
+                <label class="form-label">Trạng thái</label>
+                <select name="IsActive" class="form-select">
+                    <option value="true" selected>Hoạt động</option>
+                    <option value="false">Không hoạt động</option>
+                </select>
             </div>
 
             <button type="submit" class="btn btn-primary btn-ad-save">Lưu</button>

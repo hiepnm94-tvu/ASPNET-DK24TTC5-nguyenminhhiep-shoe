@@ -187,7 +187,11 @@ BEGIN
         IsActive BIT NOT NULL DEFAULT(1),
         CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
         UpdatedAt DATETIME2 NULL,
-        CONSTRAINT UQ_Posts_Slug UNIQUE (Slug)
+        CreatedBy INT NULL,
+        UpdatedBy INT NULL,
+        CONSTRAINT UQ_Posts_Slug UNIQUE (Slug),
+        CONSTRAINT FK_Posts_CreatedBy FOREIGN KEY (CreatedBy) REFERENCES dbo.Users(UserId),
+        CONSTRAINT FK_Posts_UpdatedBy FOREIGN KEY (UpdatedBy) REFERENCES dbo.Users(UserId)
     );
 END
 
@@ -215,10 +219,33 @@ BEGIN
         MetaKeywords NVARCHAR(500) NULL,
         FaviconUrl VARCHAR(255) NULL,
         BannerUrl VARCHAR(255) NULL,
-        UpdatedAt DATETIME2 NULL
+        UpdatedAt DATETIME2 NULL,
+        CreatedBy INT NULL,
+        UpdatedBy INT NULL,
+        CONSTRAINT FK_Settings_CreatedBy FOREIGN KEY (CreatedBy) REFERENCES dbo.Users(UserId),
+        CONSTRAINT FK_Settings_UpdatedBy FOREIGN KEY (UpdatedBy) REFERENCES dbo.Users(UserId)
     );
 
     INSERT INTO dbo.Settings (ShopName) VALUES (N'Shop Giày');
+END
+
+-- Contacts (storefront contact form)
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Contacts]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE dbo.Contacts (
+        ContactId INT IDENTITY(1,1) PRIMARY KEY,
+        FirstName NVARCHAR(100) NULL,
+        LastName NVARCHAR(100) NULL,
+        Email VARCHAR(150) NULL,
+        Subject NVARCHAR(200) NULL,
+        Message NVARCHAR(MAX) NULL,
+        IP VARCHAR(45) NULL,
+        Note NVARCHAR(500) NULL,
+        IsActive BIT NOT NULL DEFAULT(1),
+        CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+        UpdatedBy INT NULL,
+        CONSTRAINT FK_Contacts_UpdatedBy FOREIGN KEY (UpdatedBy) REFERENCES dbo.Users(UserId)
+    );
 END
 
 PRINT 'Tables created (if not existed)';

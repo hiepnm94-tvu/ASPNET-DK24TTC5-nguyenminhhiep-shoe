@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,10 +29,19 @@ namespace quanlybangiay.Controllers.Admin
             return View(items);
         }
 
+        private int? GetCurrentUserId()
+        {
+            var val = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.TryParse(val, out var id) ? id : null;
+        }
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
-            var post = await _db.Posts.FindAsync(id.Value);
+            var post = await _db.Posts
+                .Include(p => p.CreatedByUser)
+                .Include(p => p.UpdatedByUser)
+                .FirstOrDefaultAsync(p => p.PostId == id.Value);
             if (post == null) return NotFound();
             return View(post);
         }
@@ -47,6 +57,7 @@ namespace quanlybangiay.Controllers.Admin
         {
             if (ModelState.IsValid)
             {
+                post.CreatedBy = GetCurrentUserId();
                 _db.Add(post);
                 await _db.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Tạo bài viết thành công!";
@@ -74,6 +85,9 @@ namespace quanlybangiay.Controllers.Admin
             {
                 try
                 {
+                    var existing = await _db.Posts.AsNoTracking().FirstOrDefaultAsync(p => p.PostId == id);
+                    post.CreatedBy = existing?.CreatedBy;
+                    post.UpdatedBy = GetCurrentUserId();
                     post.UpdatedAt = DateTime.UtcNow;
                     _db.Update(post);
                     await _db.SaveChangesAsync();

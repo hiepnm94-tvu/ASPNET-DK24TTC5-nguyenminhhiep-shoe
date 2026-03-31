@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,12 +18,18 @@ namespace quanlybangiay.Controllers.Admin
             _db = db;
         }
 
+        private int? GetCurrentUserId()
+        {
+            var val = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.TryParse(val, out var id) ? id : null;
+        }
+
         public async Task<IActionResult> Index()
         {
             var setting = await _db.Settings.FirstOrDefaultAsync();
             if (setting == null)
             {
-                setting = new Setting { ShopName = "Shop Giày" };
+                setting = new Setting { ShopName = "Shop Giày", CreatedBy = GetCurrentUserId() };
                 _db.Settings.Add(setting);
                 await _db.SaveChangesAsync();
             }
@@ -65,6 +72,7 @@ namespace quanlybangiay.Controllers.Admin
                 existing.FaviconUrl = setting.FaviconUrl;
                 existing.BannerUrl = setting.BannerUrl;
                 existing.UpdatedAt = DateTime.UtcNow;
+                existing.UpdatedBy = GetCurrentUserId();
 
                 await _db.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Lưu cài đặt thành công!";
