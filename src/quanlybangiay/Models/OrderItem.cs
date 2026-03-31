@@ -14,13 +14,13 @@ namespace quanlybangiay.Models
         public int VariantId { get; set; }
 
         [StringLength(200)]
-        public string ProductName { get; set; }
+        public string ProductName { get; set; } = string.Empty;
 
         [StringLength(10)]
-        public string SizeValue { get; set; }
+        public string? SizeValue { get; set; }
 
         [StringLength(50)]
-        public string ColorName { get; set; }
+        public string? ColorName { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal UnitPrice { get; set; }
@@ -31,7 +31,7 @@ namespace quanlybangiay.Models
         public decimal LineTotal { get; set; }
 
         // Navigation
-        public Order Order { get; set; }
-        public ProductVariant Variant { get; set; }
+        public Order? Order { get; set; }
+        public ProductVariant? Variant { get; set; }
     }
 }

@@ -18,7 +18,10 @@ BEGIN
     CREATE TABLE dbo.Categories (
         CategoryId INT IDENTITY(1,1) PRIMARY KEY,
         CategoryName NVARCHAR(150) NOT NULL,
-        Slug VARCHAR(220) NULL
+        Slug VARCHAR(220) NULL,
+        IsActive BIT NOT NULL DEFAULT(1),
+        CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+        UpdatedAt DATETIME2 NULL
     );
 END
 
@@ -169,6 +172,53 @@ BEGIN
         ResponsePayload NVARCHAR(MAX) NULL,
         CONSTRAINT FK_Payments_Orders FOREIGN KEY (OrderId) REFERENCES dbo.Orders(OrderId)
     );
+END
+
+-- Posts
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Posts]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE dbo.Posts (
+        PostId INT IDENTITY(1,1) PRIMARY KEY,
+        Title NVARCHAR(200) NOT NULL,
+        Slug VARCHAR(220) NULL,
+        ShortDescription NVARCHAR(500) NULL,
+        Content NVARCHAR(MAX) NULL,
+        ThumbnailUrl VARCHAR(255) NULL,
+        IsActive BIT NOT NULL DEFAULT(1),
+        CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+        UpdatedAt DATETIME2 NULL,
+        CONSTRAINT UQ_Posts_Slug UNIQUE (Slug)
+    );
+END
+
+-- Settings (single-record site configuration)
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Settings]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE dbo.Settings (
+        SettingId INT IDENTITY(1,1) PRIMARY KEY,
+        ShopName NVARCHAR(200) NULL,
+        LogoUrl VARCHAR(255) NULL,
+        Phone VARCHAR(20) NULL,
+        Hotline VARCHAR(20) NULL,
+        Email VARCHAR(150) NULL,
+        Address NVARCHAR(500) NULL,
+        WorkingHours NVARCHAR(500) NULL,
+        FooterContent NVARCHAR(MAX) NULL,
+        CopyrightText NVARCHAR(255) NULL,
+        FacebookUrl VARCHAR(255) NULL,
+        InstagramUrl VARCHAR(255) NULL,
+        YoutubeUrl VARCHAR(255) NULL,
+        TiktokUrl VARCHAR(255) NULL,
+        ZaloUrl VARCHAR(255) NULL,
+        MetaTitle NVARCHAR(200) NULL,
+        MetaDescription NVARCHAR(500) NULL,
+        MetaKeywords NVARCHAR(500) NULL,
+        FaviconUrl VARCHAR(255) NULL,
+        BannerUrl VARCHAR(255) NULL,
+        UpdatedAt DATETIME2 NULL
+    );
+
+    INSERT INTO dbo.Settings (ShopName) VALUES (N'Shop Giày');
 END
 
 PRINT 'Tables created (if not existed)';

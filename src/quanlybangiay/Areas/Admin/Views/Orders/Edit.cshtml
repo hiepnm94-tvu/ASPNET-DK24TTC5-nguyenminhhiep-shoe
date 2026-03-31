@@ -1,0 +1,71 @@
+@model quanlybangiay.Models.Order
+
+@{
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
+    ViewData["Title"] = "Cập nhật đơn hàng";
+}
+
+<div class="card mb-4">
+    <h2 class="card-header fw-bold py-3 mb-4">Cập nhật đơn hàng #@Model.OrderCode</h2>
+
+    <div class="card-body">
+        <div class="mb-4">
+            <label class="form-label fw-bold">Khách hàng</label>
+            <div>@(Model.User?.FullName ?? "—") (@(Model.User?.Email ?? "—"))</div>
+        </div>
+        <div class="mb-4">
+            <label class="form-label fw-bold">Tổng tiền</label>
+            <div class="fs-5 fw-bold text-primary">@Model.TotalAmount.ToString("N0") ₫</div>
+        </div>
+
+        <form asp-area="Admin" asp-controller="Orders" asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.OrderId" />
+
+            @{
+                var orderStatusItems = new List<(string Value, string Text)>
+                {
+                    ("0", "Chờ xác nhận"),
+                    ("1", "Đã xác nhận"),
+                    ("2", "Đang giao"),
+                    ("3", "Đã giao"),
+                    ("4", "Đã hủy")
+                };
+                var paymentStatusItems = new List<(string Value, string Text)>
+                {
+                    ("0", "Chưa thanh toán"),
+                    ("1", "Đã thanh toán"),
+                    ("2", "Hoàn tiền")
+                };
+            }
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Trạng thái đơn hàng</label>
+                    <select name="OrderStatus" class="form-select">
+                        @foreach (var item in orderStatusItems)
+                        {
+                            <option value="@item.Value" selected="@(Model.OrderStatus.ToString() == item.Value)">@item.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Trạng thái thanh toán</label>
+                    <select name="PaymentStatus" class="form-select">
+                        @foreach (var item in paymentStatusItems)
+                        {
+                            <option value="@item.Value" selected="@(Model.PaymentStatus.ToString() == item.Value)">@item.Text</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Ghi chú</label>
+                <textarea name="Note" class="form-control" rows="3" placeholder="Ghi chú đơn hàng">@Model.Note</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-ad-save">Lưu</button>
+            <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="btn btn-outline-secondary btn-ad-cancel">Hủy</a>
+        </form>
+    </div>
+</div>

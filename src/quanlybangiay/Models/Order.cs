@@ -11,7 +11,7 @@ namespace quanlybangiay.Models
         public long OrderId { get; set; }
 
         [Required, StringLength(20)]
-        public string OrderCode { get; set; }
+        public string OrderCode { get; set; } = string.Empty;
 
         public int UserId { get; set; }
 
@@ -36,13 +36,13 @@ namespace quanlybangiay.Models
         public byte? OrderStatus { get; set; }
 
         [StringLength(500)]
-        public string Note { get; set; }
+        public string? Note { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime? UpdatedAt { get; set; }
 
         // Navigation
-        public User User { get; set; }
+        public User? User { get; set; }
     }
 }

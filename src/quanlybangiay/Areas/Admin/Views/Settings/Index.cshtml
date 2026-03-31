@@ -1,7 +1,176 @@
+@model quanlybangiay.Models.Setting
 @{
     Layout = "~/Views/Shared/_ManageLayout.cshtml";
     ViewData["Title"] = "Cài đặt chung";
 }
 
-<h1>Cài đặt chung</h1>
-<p>Các cấu hình hệ thống sẽ hiển thị ở đây.</p>
+<form asp-area="Admin" asp-controller="Settings" asp-action="Index" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="SettingId" />
+
+    <div class="row">
+        <!-- Thông tin cửa hàng -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bx bx-store me-2"></i>Thông tin cửa hàng</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Tên cửa hàng</label>
+                        <input asp-for="ShopName" class="form-control" placeholder="VD: Shop Giày ABC" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Địa chỉ</label>
+                        <textarea asp-for="Address" class="form-control" rows="2" placeholder="VD: 123 Nguyễn Văn A, Quận 1, TP.HCM"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Số điện thoại</label>
+                            <input asp-for="Phone" class="form-control" placeholder="VD: 0901234567" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Hotline</label>
+                            <input asp-for="Hotline" class="form-control" placeholder="VD: 1900 xxxx" />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email liên hệ</label>
+                        <input asp-for="Email" type="email" class="form-control" placeholder="VD: contact@shopgiay.vn" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giờ làm việc</label>
+                        <input asp-for="WorkingHours" class="form-control" placeholder="VD: 8:00 - 21:00, Thứ 2 - Chủ nhật" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hình ảnh & Giao diện -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bx bx-image me-2"></i>Hình ảnh & Giao diện</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Logo URL</label>
+                        <input asp-for="LogoUrl" class="form-control" placeholder="VD: /images/logo.png" />
+                        @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                        {
+                            <div class="mt-2">
+                                <img src="@Model.LogoUrl" alt="Logo" style="max-height:60px;" class="border rounded p-1" />
+                            </div>
+                        }
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Favicon URL</label>
+                        <input asp-for="FaviconUrl" class="form-control" placeholder="VD: /images/favicon.ico" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Banner URL</label>
+                        <input asp-for="BannerUrl" class="form-control" placeholder="VD: /images/banner.jpg" />
+                        @if (!string.IsNullOrEmpty(Model.BannerUrl))
+                        {
+                            <div class="mt-2">
+                                <img src="@Model.BannerUrl" alt="Banner" style="max-height:80px;max-width:100%;" class="border rounded" />
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mạng xã hội -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bx bx-share-alt me-2"></i>Mạng xã hội</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label"><i class="bx bxl-facebook-circle me-1"></i>Facebook</label>
+                        <input asp-for="FacebookUrl" class="form-control" placeholder="https://facebook.com/..." />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="bx bxl-instagram me-1"></i>Instagram</label>
+                        <input asp-for="InstagramUrl" class="form-control" placeholder="https://instagram.com/..." />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="bx bxl-youtube me-1"></i>Youtube</label>
+                        <input asp-for="YoutubeUrl" class="form-control" placeholder="https://youtube.com/..." />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="bx bxl-tiktok me-1"></i>TikTok</label>
+                        <input asp-for="TiktokUrl" class="form-control" placeholder="https://tiktok.com/..." />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Zalo</label>
+                        <input asp-for="ZaloUrl" class="form-control" placeholder="https://zalo.me/..." />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer & Bản quyền -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bx bx-dock-bottom me-2"></i>Footer & Bản quyền</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nội dung Footer</label>
+                        <textarea asp-for="FooterContent" class="form-control" rows="4" placeholder="Nội dung hiển thị ở chân trang..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Bản quyền</label>
+                        <input asp-for="CopyrightText" class="form-control" placeholder="VD: © 2026 Shop Giày. All rights reserved." />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEO -->
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bx bx-search-alt me-2"></i>SEO - Tối ưu công cụ tìm kiếm</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Meta Title</label>
+                            <input asp-for="MetaTitle" class="form-control" placeholder="Tiêu đề hiển thị trên kết quả tìm kiếm" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Meta Keywords</label>
+                            <input asp-for="MetaKeywords" class="form-control" placeholder="VD: giày, sneaker, thể thao, thời trang" />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Meta Description</label>
+                        <textarea asp-for="MetaDescription" class="form-control" rows="3" placeholder="Mô tả ngắn về website hiển thị trên kết quả tìm kiếm..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nút lưu -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        @if (Model.UpdatedAt.HasValue)
+        {
+            <small class="text-muted">
+                <i class="bx bx-time me-1"></i>Cập nhật lần cuối: @Model.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")
+            </small>
+        }
+        else
+        {
+            <span></span>
+        }
+        <button type="submit" class="btn btn-primary px-4">
+            <i class="bx bx-save me-1"></i>Lưu cài đặt
+        </button>
+    </div>
+</form>

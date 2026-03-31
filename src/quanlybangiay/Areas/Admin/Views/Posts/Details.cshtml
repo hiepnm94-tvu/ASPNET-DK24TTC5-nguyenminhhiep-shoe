@@ -1,0 +1,57 @@
+@model quanlybangiay.Models.Post
+@{
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
+    ViewData["Title"] = "Chi tiết bài viết";
+}
+
+<div class="card mb-4">
+    <h2 class="card-header fw-bold py-3 mb-4">Chi tiết bài viết</h2>
+    <div class="card-body">
+        <div class="mb-3">
+            <label class="form-label fw-bold">ID</label>
+            <div>@Model.PostId</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Tiêu đề</label>
+            <div>@Model.Title</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Slug</label>
+            <div>@Model.Slug</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Mô tả ngắn</label>
+            <div>@Model.ShortDescription</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Nội dung</label>
+            <div>@Html.Raw(Model.Content)</div>
+        </div>
+        @if (!string.IsNullOrEmpty(Model.ThumbnailUrl))
+        {
+            <div class="mb-3">
+                <label class="form-label fw-bold">Ảnh đại diện</label>
+                <div>
+                    <img src="@Model.ThumbnailUrl" alt="Thumbnail" style="max-width: 300px; max-height: 200px;" class="img-fluid rounded" />
+                </div>
+            </div>
+        }
+        <div class="mb-3">
+            <label class="form-label fw-bold">Trạng thái</label>
+            <div>
+                <span class="badge @(Model.IsActive == true ? "bg-label-primary" : "bg-label-dark")">@(Model.IsActive == true ? "Hoạt động" : "Không hoạt động")</span>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Ngày tạo</label>
+            <div>@(Model.CreatedAt?.ToString("dd/MM/yyyy HH:mm"))</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Ngày cập nhật</label>
+            <div>@(Model.UpdatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "—")</div>
+        </div>
+    </div>
+</div>
+
+<a asp-area="Admin" asp-controller="Posts" asp-action="Edit" asp-route-id="@Model.PostId" class="btn btn-secondary">Sửa</a>
+<a asp-area="Admin" asp-controller="Posts" asp-action="Index" class="btn btn-outline-secondary">Quay lại</a>

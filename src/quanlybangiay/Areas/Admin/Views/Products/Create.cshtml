@@ -1,0 +1,79 @@
+@model quanlybangiay.Models.Product
+@{
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
+    ViewData["Title"] = "Tạo sản phẩm";
+}
+
+<div class="card mb-4">
+    <h2 class="card-header fw-bold py-3 mb-4">Tạo sản phẩm</h2>
+    <div class="card-body">
+        <form asp-area="Admin" asp-controller="Products" asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label class="form-label">Chuyên mục</label>
+                <select asp-for="CategoryId" asp-items="@ViewBag.Categories" class="form-select">
+                    <option value="">-- Chọn chuyên mục --</option>
+                </select>
+                @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Tên sản phẩm</label>
+                <input asp-for="ProductName" class="form-control" placeholder="Vui lòng nhập tên sản phẩm" required />
+                @Html.ValidationMessageFor(m => m.ProductName, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Slug</label>
+                <input asp-for="Slug" class="form-control" placeholder="Vui lòng nhập slug" required />
+                @Html.ValidationMessageFor(m => m.Slug, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Thương hiệu</label>
+                <input asp-for="Brand" class="form-control" placeholder="Vui lòng nhập thương hiệu" />
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Giá gốc</label>
+                    <input asp-for="BasePrice" type="number" step="1000" class="form-control" placeholder="0" required />
+                    @Html.ValidationMessageFor(m => m.BasePrice, "", new { @class = "text-danger" })
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Giá khuyến mãi</label>
+                    <input asp-for="DiscountPrice" type="number" step="1000" class="form-control" placeholder="0" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Mô tả ngắn</label>
+                <textarea asp-for="ShortDescription" class="form-control" rows="3" placeholder="Vui lòng nhập mô tả ngắn"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Mô tả chi tiết</label>
+                <textarea asp-for="Description" class="form-control" rows="6" placeholder="Vui lòng nhập mô tả chi tiết"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Ảnh đại diện (URL)</label>
+                <input asp-for="ThumbnailUrl" class="form-control" placeholder="Vui lòng nhập URL ảnh" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Trạng thái</label>
+                <select asp-for="Status" class="form-select">
+                    <option value="">-- Chọn trạng thái --</option>
+                    <option value="1">Hoạt động</option>
+                    <option value="0">Ẩn</option>
+                    <option value="2">Nháp</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-ad-save">Lưu</button>
+            <a asp-area="Admin" asp-controller="Products" asp-action="Index" class="btn btn-outline-secondary btn-ad-cancel">Hủy</a>
+        </form>
+    </div>
+</div>

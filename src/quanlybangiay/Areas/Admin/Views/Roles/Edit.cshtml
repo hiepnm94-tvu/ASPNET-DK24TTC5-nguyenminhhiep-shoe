@@ -1,0 +1,25 @@
+@model quanlybangiay.Models.Role
+
+@{
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
+    ViewData["Title"] = "Sửa vai trò";
+}
+
+<div class="card mb-4">
+    <h2 class="card-header fw-bold py-3 mb-4">Sửa vai trò</h2>
+
+    <div class="card-body">
+        <form asp-area="Admin" asp-controller="Roles" asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="RoleId" />
+            <div class="mb-3">
+                <label class="form-label">Tên vai trò</label>
+                <input asp-for="RoleName" class="form-control" placeholder="Vui lòng nhập tên vai trò" required />
+                @Html.ValidationMessageFor(m => m.RoleName, "", new { @class = "text-danger" })
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-ad-save">Lưu</button>
+            <a asp-area="Admin" asp-controller="Roles" asp-action="Index" class="btn btn-outline-secondary btn-ad-cancel">Hủy</a>
+        </form>
+    </div>
+</div>

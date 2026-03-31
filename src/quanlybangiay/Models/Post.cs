@@ -3,17 +3,26 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace quanlybangiay.Models
 {
-    [Table("Categories")]
-    public class Category
+    [Table("Posts")]
+    public class Post
     {
         [Key]
-        public int CategoryId { get; set; }
+        public int PostId { get; set; }
 
-        [StringLength(150)]
-        public string CategoryName { get; set; } = string.Empty;
+        [Required]
+        [StringLength(200)]
+        public string Title { get; set; } = string.Empty;
 
         [StringLength(220)]
         public string? Slug { get; set; }
+
+        [StringLength(500)]
+        public string? ShortDescription { get; set; }
+
+        public string? Content { get; set; }
+
+        [StringLength(255)]
+        public string? ThumbnailUrl { get; set; }
 
         public bool? IsActive { get; set; } = true;
 
@@ -24,13 +33,8 @@ namespace quanlybangiay.Models
         [NotMapped]
         public bool IsActiveChecked
         {
-            get {
-                return IsActive ?? true;
-            }
-           
-            set {
-                IsActive = value;
-            }
+            get { return IsActive ?? true; }
+            set { IsActive = value; }
         }
     }
 }

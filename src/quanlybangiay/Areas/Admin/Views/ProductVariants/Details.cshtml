@@ -1,0 +1,83 @@
+@model quanlybangiay.Models.ProductVariant
+@{
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
+    ViewData["Title"] = "Chi tiết biến thể sản phẩm";
+}
+
+<div class="card mb-4">
+    <h2 class="card-header fw-bold py-3 mb-4">Chi tiết biến thể sản phẩm</h2>
+    <div class="card-body">
+        <div class="mb-3">
+            <label class="form-label fw-bold">ID</label>
+            <div>@Model.VariantId</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Sản phẩm</label>
+            <div>
+                @if (Model.Product != null)
+                {
+                    <a asp-area="Admin" asp-controller="Products" asp-action="Details" asp-route-id="@Model.ProductId">@Model.Product.ProductName</a>
+                }
+                else
+                {
+                    <text>—</text>
+                }
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">SKU</label>
+            <div><strong>@Model.SKU</strong></div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label fw-bold">Size</label>
+                <div>@(Model.SizeValue ?? "—")</div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label fw-bold">Tên màu</label>
+                <div>@(Model.ColorName ?? "—")</div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label fw-bold">Mã màu</label>
+                <div>
+                    @if (!string.IsNullOrEmpty(Model.ColorCode))
+                    {
+                        <span style="display:inline-block;width:22px;height:22px;background:@Model.ColorCode;border:1px solid #ccc;border-radius:3px;vertical-align:middle;"></span>
+                        @Model.ColorCode
+                    }
+                    else
+                    {
+                        <text>—</text>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label fw-bold">Tồn kho</label>
+                <div>@Model.StockQty</div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label fw-bold">Giá thêm</label>
+                <div>@(Model.AdditionalPrice?.ToString("N0") ?? "0") ₫</div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label fw-bold">Trọng lượng</label>
+                <div>@(Model.WeightGram?.ToString() ?? "—") g</div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Biến thể mặc định</label>
+            <div>
+                <span class="badge @(Model.IsDefault ? "bg-label-primary" : "bg-label-dark")">@(Model.IsDefault ? "Có" : "Không")</span>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Ngày tạo</label>
+            <div>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+        </div>
+    </div>
+</div>
+
+<a asp-area="Admin" asp-controller="ProductVariants" asp-action="Edit" asp-route-id="@Model.VariantId" class="btn btn-secondary">Sửa</a>
+<a asp-area="Admin" asp-controller="ProductVariants" asp-action="Index" asp-route-productId="@Model.ProductId" class="btn btn-outline-secondary">Quay lại</a>

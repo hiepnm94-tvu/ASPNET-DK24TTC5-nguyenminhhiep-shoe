@@ -13,10 +13,10 @@ namespace quanlybangiay.Models
         public long OrderId { get; set; }
 
         [StringLength(30)]
-        public string Method { get; set; }
+        public string? Method { get; set; }
 
         [StringLength(100)]
-        public string GatewayTransactionId { get; set; }
+        public string? GatewayTransactionId { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
@@ -25,9 +25,9 @@ namespace quanlybangiay.Models
 
         public byte? Status { get; set; }
 
-        public string ResponsePayload { get; set; }
+        public string? ResponsePayload { get; set; }
 
         // Navigation
-        public Order Order { get; set; }
+        public Order? Order { get; set; }
     }
 }
