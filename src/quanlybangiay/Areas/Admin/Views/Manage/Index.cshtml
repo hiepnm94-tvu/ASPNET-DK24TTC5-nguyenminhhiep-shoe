@@ -1,8 +1,320 @@
 @{
     Layout = "~/Views/Shared/_ManageLayout.cshtml";
-    ViewData["Title"] = "Manage";
+    ViewData["Title"] = "Tổng quan";
+
+    string activeRange = ViewBag.ActiveRange ?? "30days";
+    decimal totalRevenue = ViewBag.TotalRevenue ?? 0m;
+    int totalOrders = ViewBag.TotalOrders ?? 0;
+    int paidOrders = ViewBag.PaidOrders ?? 0;
+    int pendingOrders = ViewBag.PendingOrders ?? 0;
+    int cancelledOrders = ViewBag.CancelledOrders ?? 0;
+    int totalProducts = ViewBag.TotalProducts ?? 0;
+    int totalCustomers = ViewBag.TotalCustomers ?? 0;
+
+    var chartLabels = ViewBag.ChartLabels as List<string> ?? new List<string>();
+    var chartData = ViewBag.ChartData as List<decimal> ?? new List<decimal>();
+    var topProducts = ViewBag.TopProducts as dynamic ?? new List<dynamic>();
+    var lowStockItems = ViewBag.LowStockItems as List<quanlybangiay.Models.ProductVariant> ?? new List<quanlybangiay.Models.ProductVariant>();
+    int lowStockThreshold = ViewBag.LowStockThreshold ?? 5;
+
+    string RangeLabel(string r) => r switch
+    {
+        "today" => "Hôm nay",
+        "7days" => "7 ngày",
+        "30days" => "30 ngày",
+        "year" => "Năm nay",
+        "all" => "Tất cả",
+        _ => "30 ngày"
+    };
 }
 
-<h1>@ViewData["Title"]</h1>
+<!-- 1. Bộ lọc thời gian -->
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h4 class="fw-bold mb-0">
+        <span class="text-muted fw-light">Tổng quan /</span> @RangeLabel(activeRange)
+    </h4>
+    <div class="btn-group" role="group">
+        <a href="?range=today" class="btn btn-sm @(activeRange == "today" ? "btn-primary" : "btn-outline-primary")">Hôm nay</a>
+        <a href="?range=7days" class="btn btn-sm @(activeRange == "7days" ? "btn-primary" : "btn-outline-primary")">7 ngày</a>
+        <a href="?range=30days" class="btn btn-sm @(activeRange == "30days" ? "btn-primary" : "btn-outline-primary")">30 ngày</a>
+        <a href="?range=year" class="btn btn-sm @(activeRange == "year" ? "btn-primary" : "btn-outline-primary")">Năm nay</a>
+        <a href="?range=all" class="btn btn-sm @(activeRange == "all" ? "btn-primary" : "btn-outline-primary")">Tất cả</a>
+    </div>
+</div>
 
-<p>Welcome to the Manage area. Add admin UI here.</p>
+<!-- 2. Thẻ thống kê doanh thu -->
+<div class="row">
+    <div class="col-lg-4 col-md-6 col-sm-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <span class="fw-semibold d-block mb-1 text-muted">Doanh thu</span>
+                        <h3 class="card-title mb-1 text-primary fw-bold">@totalRevenue.ToString("N0") ₫</h3>
+                    </div>
+                    <div class="avatar flex-shrink-0">
+                        <span class="avatar-initial rounded bg-label-primary">
+                            <i class="bx bx-dollar-circle bx-sm"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-6 col-sm-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <span class="fw-semibold d-block mb-1 text-muted">Đơn hàng</span>
+                        <h3 class="card-title mb-1 fw-bold">@totalOrders</h3>
+                    </div>
+                    <div class="avatar flex-shrink-0">
+                        <span class="avatar-initial rounded bg-label-info">
+                            <i class="bx bx-cart bx-sm"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <span class="fw-semibold d-block mb-1 text-muted">Chờ xử lý</span>
+                        <h3 class="card-title mb-1 fw-bold text-warning">@pendingOrders</h3>
+                    </div>
+                    <div class="avatar flex-shrink-0">
+                        <span class="avatar-initial rounded bg-label-warning">
+                            <i class="bx bx-time-five bx-sm"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <span class="fw-semibold d-block mb-1 text-muted">Sản phẩm</span>
+                        <h3 class="card-title mb-1 fw-bold">@totalProducts</h3>
+                    </div>
+                    <div class="avatar flex-shrink-0">
+                        <span class="avatar-initial rounded bg-label-success">
+                            <i class="bx bx-box bx-sm"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <span class="fw-semibold d-block mb-1 text-muted">Khách hàng</span>
+                        <h3 class="card-title mb-1 fw-bold">@totalCustomers</h3>
+                    </div>
+                    <div class="avatar flex-shrink-0">
+                        <span class="avatar-initial rounded bg-label-dark">
+                            <i class="bx bx-group bx-sm"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 3. Biểu đồ doanh thu 30 ngày -->
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0"><i class="bx bx-line-chart me-2"></i>Doanh thu 30 ngày gần nhất</h5>
+            </div>
+            <div class="card-body">
+                <div id="revenueChart"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 4. Sản phẩm bán chạy -->
+    <div class="col-lg-7 col-md-12 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="bx bx-trophy me-2 text-warning"></i>Top 10 sản phẩm bán chạy</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Sản phẩm</th>
+                            <th class="text-end">SL bán</th>
+                            <th class="text-end">Doanh thu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (((IEnumerable<dynamic>)topProducts).Any())
+                        {
+                            int rank = 1;
+                            foreach (var p in (IEnumerable<dynamic>)topProducts)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (rank <= 3)
+                                        {
+                                            <span class="badge bg-label-warning rounded-pill">@rank</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">@rank</span>
+                                        }
+                                    </td>
+                                    <td class="text-wrap" style="max-width:300px;">@p.ProductName</td>
+                                    <td class="text-end fw-semibold">@p.TotalQty</td>
+                                    <td class="text-end">@p.TotalSales ₫</td>
+                                </tr>
+                                rank++;
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">Chưa có dữ liệu bán hàng</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Sản phẩm sắp hết hàng -->
+    <div class="col-lg-5 col-md-12 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0"><i class="bx bx-error-circle me-2 text-danger"></i>Sắp hết hàng</h5>
+                <span class="badge bg-danger">≤ @lowStockThreshold sản phẩm</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th>SKU</th>
+                            <th>Size</th>
+                            <th class="text-end">Tồn kho</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (lowStockItems.Any())
+                        {
+                            foreach (var v in lowStockItems)
+                            {
+                                var rowClass = v.StockQty == 0 ? "table-danger" : (v.StockQty <= 2 ? "table-warning" : "");
+                                <tr class="@rowClass">
+                                    <td class="text-wrap" style="max-width:180px;">
+                                        <a asp-area="Admin" asp-controller="ProductVariants" asp-action="Edit" asp-route-id="@v.VariantId"
+                                           class="text-body">
+                                            @(v.Product?.ProductName ?? "—")
+                                        </a>
+                                    </td>
+                                    <td><code>@v.SKU</code></td>
+                                    <td>@(v.SizeValue ?? "—")</td>
+                                    <td class="text-end">
+                                        @if (v.StockQty == 0)
+                                        {
+                                            <span class="badge bg-danger">Hết hàng</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="fw-bold text-danger">@v.StockQty</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    <i class="bx bx-check-circle text-success me-1"></i>Tất cả sản phẩm đều đủ hàng
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    var options = {
+        series: [{
+            name: 'Doanh thu',
+            data: [@Html.Raw(string.Join(",", chartData))]
+        }],
+        chart: {
+            type: 'area',
+            height: 350,
+            fontFamily: 'Public Sans, sans-serif',
+            toolbar: { show: true },
+            zoom: { enabled: true }
+        },
+        colors: ['#696cff'],
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.5,
+                opacityTo: 0.1,
+                stops: [0, 95, 100]
+            }
+        },
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 3 },
+        xaxis: {
+            categories: [@Html.Raw(string.Join(",", chartLabels.Select(l => "'" + l + "'")))],
+            labels: {
+                style: { fontSize: '11px' },
+                rotate: -45,
+                rotateAlways: @(chartData.Count > 15 ? "true" : "false")
+            }
+        },
+        yaxis: {
+            labels: {
+                formatter: function(val) {
+                    if (val >= 1000000) return (val / 1000000).toFixed(1) + 'M';
+                    if (val >= 1000) return (val / 1000).toFixed(0) + 'K';
+                    return val.toFixed(0);
+                }
+            }
+        },
+        tooltip: {
+            y: {
+                formatter: function(val) {
+                    return val.toLocaleString('vi-VN') + ' ₫';
+                }
+            }
+        },
+        grid: {
+            borderColor: '#f1f1f1',
+            padding: { left: 10, right: 10 }
+        }
+    };
+
+    var chart = new ApexCharts(document.querySelector("#revenueChart"), options);
+    chart.render();
+</script>
+}

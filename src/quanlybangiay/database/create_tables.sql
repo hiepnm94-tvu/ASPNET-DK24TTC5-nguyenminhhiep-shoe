@@ -18,7 +18,10 @@ BEGIN
     CREATE TABLE dbo.Categories (
         CategoryId INT IDENTITY(1,1) PRIMARY KEY,
         CategoryName NVARCHAR(150) NOT NULL,
-        Slug VARCHAR(220) NULL
+        Slug VARCHAR(220) NULL,
+        IsActive BIT NOT NULL DEFAULT(1),
+        CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+        UpdatedAt DATETIME2 NULL
     );
 END
 
@@ -168,6 +171,80 @@ BEGIN
         Status TINYINT NULL,
         ResponsePayload NVARCHAR(MAX) NULL,
         CONSTRAINT FK_Payments_Orders FOREIGN KEY (OrderId) REFERENCES dbo.Orders(OrderId)
+    );
+END
+
+-- Posts
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Posts]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE dbo.Posts (
+        PostId INT IDENTITY(1,1) PRIMARY KEY,
+        Title NVARCHAR(200) NOT NULL,
+        Slug VARCHAR(220) NULL,
+        ShortDescription NVARCHAR(500) NULL,
+        Content NVARCHAR(MAX) NULL,
+        ThumbnailUrl VARCHAR(255) NULL,
+        IsActive BIT NOT NULL DEFAULT(1),
+        CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+        UpdatedAt DATETIME2 NULL,
+        CreatedBy INT NULL,
+        UpdatedBy INT NULL,
+        CONSTRAINT UQ_Posts_Slug UNIQUE (Slug),
+        CONSTRAINT FK_Posts_CreatedBy FOREIGN KEY (CreatedBy) REFERENCES dbo.Users(UserId),
+        CONSTRAINT FK_Posts_UpdatedBy FOREIGN KEY (UpdatedBy) REFERENCES dbo.Users(UserId)
+    );
+END
+
+-- Settings (single-record site configuration)
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Settings]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE dbo.Settings (
+        SettingId INT IDENTITY(1,1) PRIMARY KEY,
+        ShopName NVARCHAR(200) NULL,
+        LogoUrl VARCHAR(255) NULL,
+        Phone VARCHAR(20) NULL,
+        Hotline VARCHAR(20) NULL,
+        Email VARCHAR(150) NULL,
+        Address NVARCHAR(500) NULL,
+        WorkingHours NVARCHAR(500) NULL,
+        FooterContent NVARCHAR(MAX) NULL,
+        CopyrightText NVARCHAR(255) NULL,
+        FacebookUrl VARCHAR(255) NULL,
+        InstagramUrl VARCHAR(255) NULL,
+        YoutubeUrl VARCHAR(255) NULL,
+        TiktokUrl VARCHAR(255) NULL,
+        ZaloUrl VARCHAR(255) NULL,
+        MetaTitle NVARCHAR(200) NULL,
+        MetaDescription NVARCHAR(500) NULL,
+        MetaKeywords NVARCHAR(500) NULL,
+        FaviconUrl VARCHAR(255) NULL,
+        BannerUrl VARCHAR(255) NULL,
+        UpdatedAt DATETIME2 NULL,
+        CreatedBy INT NULL,
+        UpdatedBy INT NULL,
+        CONSTRAINT FK_Settings_CreatedBy FOREIGN KEY (CreatedBy) REFERENCES dbo.Users(UserId),
+        CONSTRAINT FK_Settings_UpdatedBy FOREIGN KEY (UpdatedBy) REFERENCES dbo.Users(UserId)
+    );
+
+    INSERT INTO dbo.Settings (ShopName) VALUES (N'Shop Giày');
+END
+
+-- Contacts (storefront contact form)
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Contacts]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE dbo.Contacts (
+        ContactId INT IDENTITY(1,1) PRIMARY KEY,
+        FirstName NVARCHAR(100) NULL,
+        LastName NVARCHAR(100) NULL,
+        Email VARCHAR(150) NULL,
+        Subject NVARCHAR(200) NULL,
+        Message NVARCHAR(MAX) NULL,
+        IP VARCHAR(45) NULL,
+        Note NVARCHAR(500) NULL,
+        IsActive BIT NOT NULL DEFAULT(1),
+        CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+        UpdatedBy INT NULL,
+        CONSTRAINT FK_Contacts_UpdatedBy FOREIGN KEY (UpdatedBy) REFERENCES dbo.Users(UserId)
     );
 END
 

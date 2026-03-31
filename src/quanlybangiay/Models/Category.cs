@@ -10,10 +10,10 @@ namespace quanlybangiay.Models
         public int CategoryId { get; set; }
 
         [StringLength(150)]
-        public string CategoryName { get; set; }
+        public string CategoryName { get; set; } = string.Empty;
 
         [StringLength(220)]
-        public string Slug { get; set; }
+        public string? Slug { get; set; }
 
         public bool? IsActive { get; set; } = true;
 

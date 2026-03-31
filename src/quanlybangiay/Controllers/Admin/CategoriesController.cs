@@ -19,9 +19,14 @@ namespace quanlybangiay.Controllers.Admin
             _db = db;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 20)
         {
-            var items = await _db.Categories.OrderBy(c => c.CategoryId).ToListAsync();
+            var query = _db.Categories.OrderBy(c => c.CategoryId).AsQueryable();
+            var items = await PaginatedList<Category>.CreateAsync(query, page, pageSize);
+            ViewBag.Page = items.PageIndex;
+            ViewBag.PageSize = items.PageSize;
+            ViewBag.TotalCount = items.TotalCount;
+            ViewBag.TotalPages = items.TotalPages;
             return View(items);
         }
 
@@ -46,8 +51,10 @@ namespace quanlybangiay.Controllers.Admin
             {
                 _db.Add(category);
                 await _db.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Tạo chuyên mục thành công!";
                 return RedirectToAction(nameof(Index));
             }
+            TempData["ErrorMessage"] = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
             return View(category);
         }
 
@@ -78,8 +85,10 @@ namespace quanlybangiay.Controllers.Admin
                         return NotFound();
                     throw;
                 }
+                TempData["SuccessMessage"] = "Cập nhật chuyên mục thành công!";
                 return RedirectToAction(nameof(Index));
             }
+            TempData["ErrorMessage"] = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
             return View(category);
         }
 
@@ -92,6 +101,11 @@ namespace quanlybangiay.Controllers.Admin
             {
                 _db.Categories.Remove(category);
                 await _db.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Xóa chuyên mục thành công!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy chuyên mục cần xóa.";
             }
             return RedirectToAction(nameof(Index));
         }

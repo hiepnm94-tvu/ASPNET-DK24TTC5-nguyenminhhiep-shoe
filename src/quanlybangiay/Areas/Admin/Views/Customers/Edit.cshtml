@@ -1,0 +1,78 @@
+@model quanlybangiay.Models.User
+
+@{
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
+    ViewData["Title"] = "Sửa khách hàng";
+}
+
+<div class="card mb-4">
+    <h2 class="card-header fw-bold py-3 mb-4">Sửa khách hàng</h2>
+
+    <div class="card-body">
+        <form asp-area="Admin" asp-controller="Customers" asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="UserId" />
+
+            <div class="mb-3">
+                <label class="form-label">Vai trò</label>
+                <select asp-for="RoleId" asp-items="@ViewBag.Roles" class="form-select">
+                    <option value="">-- Chọn vai trò --</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Họ tên</label>
+                <input asp-for="FullName" class="form-control" placeholder="Vui lòng nhập họ tên" />
+                @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input asp-for="Email" type="email" class="form-control" placeholder="Vui lòng nhập email" required />
+                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Mật khẩu mới (để trống nếu không đổi)</label>
+                <input type="password" name="Password" class="form-control" placeholder="Nhập mật khẩu mới" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Điện thoại</label>
+                <input asp-for="Phone" class="form-control" placeholder="Vui lòng nhập số điện thoại" />
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Giới tính</label>
+                    <select asp-for="Gender" class="form-select">
+                        <option value="">-- Chọn giới tính --</option>
+                        <option value="1">Nam</option>
+                        <option value="2">Nữ</option>
+                        <option value="3">Khác</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Ngày sinh</label>
+                    <input asp-for="DateOfBirth" type="date" class="form-control" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Ảnh đại diện (URL)</label>
+                <input asp-for="AvatarUrl" class="form-control" placeholder="Vui lòng nhập URL ảnh đại diện" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Trạng thái</label>
+                <select name="IsActive" class="form-select">
+                    <option value="true" selected="@(Model.IsActive)">Hoạt động</option>
+                    <option value="false" selected="@(!Model.IsActive)">Không hoạt động</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-ad-save">Lưu</button>
+            <a asp-area="Admin" asp-controller="Customers" asp-action="Index" class="btn btn-outline-secondary btn-ad-cancel">Hủy</a>
+        </form>
+    </div>
+</div>

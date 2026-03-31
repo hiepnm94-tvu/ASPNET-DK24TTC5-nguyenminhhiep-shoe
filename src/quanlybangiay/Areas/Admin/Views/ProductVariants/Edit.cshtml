@@ -1,0 +1,76 @@
+@model quanlybangiay.Models.ProductVariant
+
+@{
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
+    ViewData["Title"] = "Sửa biến thể sản phẩm";
+}
+
+<div class="card mb-4">
+    <h2 class="card-header fw-bold py-3 mb-4">Sửa biến thể sản phẩm</h2>
+
+    <div class="card-body">
+        <form asp-area="Admin" asp-controller="ProductVariants" asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="VariantId" />
+
+            <div class="mb-3">
+                <label class="form-label">Sản phẩm</label>
+                <select asp-for="ProductId" asp-items="@ViewBag.Products" class="form-select" required>
+                    <option value="">-- Chọn sản phẩm --</option>
+                </select>
+                @Html.ValidationMessageFor(m => m.ProductId, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">SKU</label>
+                <input asp-for="SKU" class="form-control" placeholder="Vui lòng nhập mã SKU" required />
+                @Html.ValidationMessageFor(m => m.SKU, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Size</label>
+                    <input asp-for="SizeValue" class="form-control" placeholder="VD: 38, 39, 40..." />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Tồn kho</label>
+                    <input asp-for="StockQty" type="number" class="form-control" placeholder="0" required />
+                    @Html.ValidationMessageFor(m => m.StockQty, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Tên màu</label>
+                    <input asp-for="ColorName" class="form-control" placeholder="VD: Đen, Trắng..." />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Mã màu</label>
+                    <input asp-for="ColorCode" type="color" class="form-control form-control-color" />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Giá thêm (₫)</label>
+                    <input asp-for="AdditionalPrice" type="number" step="1000" class="form-control" placeholder="0" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Trọng lượng (gram)</label>
+                    <input asp-for="WeightGram" type="number" class="form-control" placeholder="VD: 350" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">&nbsp;</label>
+                    <div class="form-check form-switch mt-2">
+                        <input type="hidden" name="IsDefault" value="false" />
+                        <input type="checkbox" class="form-check-input" id="IsDefault" name="IsDefault" value="true" @(Model.IsDefault ? "checked" : "") />
+                        <label class="form-check-label" for="IsDefault">Biến thể mặc định</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-ad-save">Lưu</button>
+            <a asp-area="Admin" asp-controller="ProductVariants" asp-action="Index" asp-route-productId="@Model.ProductId" class="btn btn-outline-secondary btn-ad-cancel">Hủy</a>
+        </form>
+    </div>
+</div>

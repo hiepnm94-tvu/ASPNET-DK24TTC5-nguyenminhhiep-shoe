@@ -1,3 +1,4 @@
+@model IEnumerable<quanlybangiay.Models.Category>
 @{
     Layout = "~/Views/Shared/_ManageLayout.cshtml";
     ViewData["Title"] = "Quản lý chuyên mục";
@@ -21,42 +22,38 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model)
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.CategoryId</td>
+                            <td>@item.CategoryName</td>
+                            <td>@item.Slug</td>
+                            <td>
+                                <span class="badge @(item.IsActive == true ? "bg-label-primary" : "bg-label-dark") me-1">@(item.IsActive == true ? "Hoạt động" : "Không hoạt động")</span>
+                            </td>
+                            <td>
+                                <a asp-area="Admin" asp-controller="Categories" asp-action="Edit" asp-route-id="@item.CategoryId" class="btn btn-sm btn-secondary">Sửa</a>
+                                <form asp-area="Admin" asp-controller="Categories" asp-action="Delete" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@item.CategoryId" />
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn muốn xóa chuyên mục này?');">Xóa</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td>@item.CategoryId</td>
-                        <td>@item.CategoryName</td>
-                        <td>@item.Slug</td>
-                        <td>
-                            
-                            <span class="badge @(item.IsActive == true ? "bg-label-primary" : "bg-label-dark") me-1"> @(item.IsActive == true ? "Hoạt động" : "Không hoạt động")</span>
-                        </td>
-                        <td>
-                            <a asp-area="Admin" asp-controller="Categories" asp-action="Edit" asp-route-id="@item.CategoryId" class="btn btn-sm btn-secondary">Sửa</a>
-                            <form asp-area="Admin" asp-controller="Categories" asp-action="Delete" method="post" class="d-inline">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@item.CategoryId" />
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn muốn xóa chuyên mục này?');">Xóa</button>
-                            </form>
-
-                            @* <div class="dropdown">
-                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                    <i class="bx bx-dots-vertical-rounded"></i>
-                                </button>
-                                <div class="dropdown-menu">
-                                    <a asp-area="Admin" asp-controller="Categories" asp-action="Edit" asp-route-id="@item.CategoryId" class="dropdown-item"><i class="bx bx-edit-alt me-1"></i> Sửa</a>
-                                    <form asp-area="Admin" asp-controller="Categories" asp-action="Delete" method="post" class="m-0">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="id" value="@item.CategoryId" />
-                                        <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Xóa chuyên mục này?');"><i class="bx bx-trash me-1"></i> Xóa</button>
-                                    </form>
-                                </div>
-                            </div> *@
-                        </td>
+                        <td colspan="5" class="text-center py-4 text-muted">Không có dữ liệu</td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
+
+    @await Html.PartialAsync("~/Areas/Admin/Views/Shared/_Pagination.cshtml")
 </div>
 

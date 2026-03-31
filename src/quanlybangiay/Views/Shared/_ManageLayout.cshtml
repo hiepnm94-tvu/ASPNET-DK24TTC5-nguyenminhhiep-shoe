@@ -1,4 +1,4 @@
-﻿@*
+@*
   Admin layout (Sneat template trimmed for Razor app)
 *@
 <!DOCTYPE html>
@@ -185,6 +185,7 @@
 
           <!-- Content wrapper -->
           <div class="content-wrapper">
+            @await Html.PartialAsync("~/Areas/Admin/Views/Shared/_Notification.cshtml")
             <div class="container-xxl flex-grow-1 container-p-y">
               @RenderBody()
             </div>

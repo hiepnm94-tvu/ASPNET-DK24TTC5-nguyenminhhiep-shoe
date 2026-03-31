@@ -13,16 +13,16 @@ namespace quanlybangiay.Models
         public int ProductId { get; set; }
 
         [Required, StringLength(50)]
-        public string SKU { get; set; }
+        public string SKU { get; set; } = string.Empty;
 
         [StringLength(10)]
-        public string SizeValue { get; set; }
+        public string? SizeValue { get; set; }
 
         [StringLength(50)]
-        public string ColorName { get; set; }
+        public string? ColorName { get; set; }
 
         [StringLength(10)]
-        public string ColorCode { get; set; }
+        public string? ColorCode { get; set; }
 
         public int StockQty { get; set; }
 
@@ -36,6 +36,6 @@ namespace quanlybangiay.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation
-        public Product Product { get; set; }
+        public Product? Product { get; set; }
     }
 }

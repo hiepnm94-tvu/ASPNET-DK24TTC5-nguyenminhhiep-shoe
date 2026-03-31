@@ -1,0 +1,22 @@
+@model quanlybangiay.Models.Role
+@{
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
+    ViewData["Title"] = "Chi tiết vai trò";
+}
+
+<div class="card mb-4">
+    <h2 class="card-header fw-bold py-3 mb-4">Chi tiết vai trò</h2>
+    <div class="card-body">
+        <div class="mb-3">
+            <label class="form-label fw-bold">ID</label>
+            <div>@Model.RoleId</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Tên vai trò</label>
+            <div>@Model.RoleName</div>
+        </div>
+    </div>
+</div>
+
+<a asp-area="Admin" asp-controller="Roles" asp-action="Edit" asp-route-id="@Model.RoleId" class="btn btn-secondary">Sửa</a>
+<a asp-area="Admin" asp-controller="Roles" asp-action="Index" class="btn btn-outline-secondary">Quay lại</a>
