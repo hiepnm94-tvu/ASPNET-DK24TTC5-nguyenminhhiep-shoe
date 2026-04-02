@@ -64,7 +64,21 @@
                     {
                         <tr>
                             <td><strong>@item.OrderCode</strong></td>
-                            <td>@(item.User?.FullName ?? item.User?.Email ?? "—")</td>
+                            <td>
+                                @if (item.User != null)
+                                {
+                                    @(item.User.FullName ?? item.User.Email)
+                                }
+                                else if (!string.IsNullOrWhiteSpace(item.GuestName))
+                                {
+                                    <span>@item.GuestName</span><br />
+                                    <small class="text-muted">@item.GuestPhone</small>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Khách</span>
+                                }
+                            </td>
                             <td>@item.TotalAmount.ToString("N0") ₫</td>
                             <td>
                                 <span class="badge @OrderStatusClass(item.OrderStatus) me-1">@OrderStatusLabel(item.OrderStatus)</span>

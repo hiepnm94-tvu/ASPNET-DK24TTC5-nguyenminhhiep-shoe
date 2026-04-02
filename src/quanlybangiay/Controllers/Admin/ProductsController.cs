@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using quanlybangiay.Data;
+using quanlybangiay.Helpers;
 using quanlybangiay.Models;
 
 namespace quanlybangiay.Controllers.Admin
@@ -12,10 +13,12 @@ namespace quanlybangiay.Controllers.Admin
     public class ProductsController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly IWebHostEnvironment _env;
 
-        public ProductsController(ApplicationDbContext db)
+        public ProductsController(ApplicationDbContext db, IWebHostEnvironment env)
         {
             _db = db;
+            _env = env;
         }
 
         public async Task<IActionResult> Index(int page = 1, int pageSize = 20)
@@ -58,10 +61,26 @@ namespace quanlybangiay.Controllers.Admin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CategoryId,ProductName,Slug,Brand,ShortDescription,Description,BasePrice,DiscountPrice,ThumbnailUrl,Status")] Product product)
+        public async Task<IActionResult> Create(
+            [Bind("CategoryId,ProductName,Slug,Brand,ShortDescription,Description,BasePrice,DiscountPrice,Status")] Product product,
+            IFormFile? thumbnailFile)
         {
             if (ModelState.IsValid)
             {
+                try
+                {
+                    product.ThumbnailUrl = await FileUploadHelper.SaveAsync(thumbnailFile, _env, "products")
+                                          ?? product.ThumbnailUrl;
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError("thumbnailFile", ex.Message);
+                    ViewBag.Categories = new SelectList(
+                        await _db.Categories.OrderBy(c => c.CategoryName).ToListAsync(),
+                        "CategoryId", "CategoryName", product.CategoryId);
+                    return View(product);
+                }
+
                 _db.Add(product);
                 await _db.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Tạo sản phẩm thành công!";
@@ -88,7 +107,10 @@ namespace quanlybangiay.Controllers.Admin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductId,CategoryId,ProductName,Slug,Brand,ShortDescription,Description,BasePrice,DiscountPrice,ThumbnailUrl,Status")] Product product)
+        public async Task<IActionResult> Edit(
+            int id,
+            [Bind("ProductId,CategoryId,ProductName,Slug,Brand,ShortDescription,Description,BasePrice,DiscountPrice,ThumbnailUrl,Status")] Product product,
+            IFormFile? thumbnailFile)
         {
             if (id != product.ProductId) return NotFound();
 
@@ -96,9 +118,25 @@ namespace quanlybangiay.Controllers.Admin
             {
                 try
                 {
+                    var newPath = await FileUploadHelper.SaveAsync(thumbnailFile, _env, "products");
+                    if (newPath != null)
+                    {
+                        // Delete the old uploaded file (skip if it's a static template image)
+                        FileUploadHelper.Delete(_env, product.ThumbnailUrl);
+                        product.ThumbnailUrl = newPath;
+                    }
+
                     product.UpdatedAt = DateTime.UtcNow;
                     _db.Update(product);
                     await _db.SaveChangesAsync();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError("thumbnailFile", ex.Message);
+                    ViewBag.Categories = new SelectList(
+                        await _db.Categories.OrderBy(c => c.CategoryName).ToListAsync(),
+                        "CategoryId", "CategoryName", product.CategoryId);
+                    return View(product);
                 }
                 catch (DbUpdateConcurrencyException)
                 {

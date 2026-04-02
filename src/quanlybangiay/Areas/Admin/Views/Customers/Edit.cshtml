@@ -9,7 +9,7 @@
     <h2 class="card-header fw-bold py-3 mb-4">Sửa khách hàng</h2>
 
     <div class="card-body">
-        <form asp-area="Admin" asp-controller="Customers" asp-action="Edit" method="post">
+        <form asp-area="Admin" asp-controller="Customers" asp-action="Edit" method="post" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="UserId" />
 
@@ -59,8 +59,19 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Ảnh đại diện (URL)</label>
-                <input asp-for="AvatarUrl" class="form-control" placeholder="Vui lòng nhập URL ảnh đại diện" />
+                <label class="form-label">Ảnh đại diện</label>
+                @if (!string.IsNullOrWhiteSpace(Model.AvatarUrl))
+                {
+                    <div class="mb-2">
+                        <img src="@Model.AvatarUrl" style="width:80px;height:80px;border-radius:50%;object-fit:cover;" class="border p-1" />
+                        <small class="text-muted d-block mt-1">Ảnh hiện tại — tải ảnh mới để thay thế</small>
+                    </div>
+                }
+                <input type="hidden" asp-for="AvatarUrl" />
+                <input type="file" name="avatarFile" class="form-control" accept="image/*"
+                       onchange="previewImg(this,'avatar-preview-edit')" />
+                <small class="text-muted">Định dạng: jpg, jpeg, png, gif, webp. Tối đa 5MB.</small>
+                <div id="avatar-preview-edit" class="mt-2"></div>
             </div>
 
             <div class="mb-3">

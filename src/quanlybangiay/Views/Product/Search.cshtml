@@ -1,0 +1,109 @@
+@model IEnumerable<quanlybangiay.Models.Product>
+@{
+    var searchQuery = ViewBag.SearchQuery as string;
+    var page = ViewBag.Page is int pg ? pg : 1;
+    var totalPages = ViewBag.TotalPages is int tp ? tp : 0;
+    var totalCount = ViewBag.TotalCount is int tc ? tc : 0;
+    ViewData["Title"] = string.IsNullOrWhiteSpace(searchQuery) ? "Tìm kiếm" : $"Kết quả: {searchQuery}";
+}
+
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <p class="bread">
+                    <span><a asp-controller="Home" asp-action="Index">Trang chủ</a></span> /
+                    <span>Tìm kiếm</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="colorlib-product">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 offset-sm-2 text-center colorlib-heading colorlib-heading-sm">
+                @if (!string.IsNullOrWhiteSpace(searchQuery))
+                {
+                    <h2>Kết quả tìm kiếm cho "@searchQuery"</h2>
+                    <p>Tìm thấy @totalCount sản phẩm</p>
+                }
+                else
+                {
+                    <h2>Tìm kiếm sản phẩm</h2>
+                }
+            </div>
+        </div>
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="row">
+                <div class="col-12 text-center py-5">
+                    <p class="lead mb-4">Không tìm thấy sản phẩm nào.</p>
+                    <p><a asp-controller="Product" asp-action="Category" class="btn btn-primary">Xem tất cả sản phẩm</a></p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row row-pb-md">
+                @foreach (var p in Model)
+                {
+                    <div class="col-md-3 col-lg-3 mb-4 text-center">
+                        <div class="product-entry border">
+                            <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.ProductId" class="prod-img">
+                                <img src="@(p.ThumbnailUrl ?? "/images/no-image.png")" class="img-fluid" alt="@p.ProductName">
+                            </a>
+                            <div class="desc">
+                                <h2><a asp-controller="Product" asp-action="Detail" asp-route-id="@p.ProductId">@p.ProductName</a></h2>
+                                @if (p.DiscountPrice.HasValue && p.DiscountPrice.Value < p.BasePrice)
+                                {
+                                    <span class="price">@p.DiscountPrice.Value.ToString("N0") đ</span>
+                                    <span class="price" style="text-decoration:line-through;opacity:0.55;font-size:15px;">@p.BasePrice.ToString("N0") đ</span>
+                                }
+                                else
+                                {
+                                    <span class="price">@p.BasePrice.ToString("N0") đ</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @if (totalPages > 1)
+            {
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <div class="block-27">
+                            <ul>
+                                @if (page > 1)
+                                {
+                                    <li><a href="/Product/Search?q=@Uri.EscapeDataString(searchQuery ?? "")&page=@(page-1)"><i class="ion-ios-arrow-back"></i></a></li>
+                                }
+                                @for (var i = 1; i <= totalPages; i++)
+                                {
+                                    <li class="@(i == page ? "active" : "")">
+                                        @if (i == page)
+                                        {
+                                            <span>@i</span>
+                                        }
+                                        else
+                                        {
+                                            <a href="/Product/Search?q=@Uri.EscapeDataString(searchQuery ?? "")&page=@i">@i</a>
+                                        }
+                                    </li>
+                                }
+                                @if (page < totalPages)
+                                {
+                                    <li><a href="/Product/Search?q=@Uri.EscapeDataString(searchQuery ?? "")&page=@(page+1)"><i class="ion-ios-arrow-forward"></i></a></li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

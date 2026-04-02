@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using quanlybangiay.Data;
+using quanlybangiay.Helpers;
 using quanlybangiay.Models;
 
 namespace quanlybangiay.Controllers.Admin
@@ -12,10 +13,12 @@ namespace quanlybangiay.Controllers.Admin
     public class SettingsController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly IWebHostEnvironment _env;
 
-        public SettingsController(ApplicationDbContext db)
+        public SettingsController(ApplicationDbContext db, IWebHostEnvironment env)
         {
             _db = db;
+            _env = env;
         }
 
         private int? GetCurrentUserId()
@@ -39,10 +42,12 @@ namespace quanlybangiay.Controllers.Admin
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(
-            [Bind("SettingId,ShopName,LogoUrl,Phone,Hotline,Email,Address,WorkingHours," +
+            [Bind("SettingId,ShopName,LogoUrl,BannerUrl,Phone,Hotline,Email,Address,WorkingHours," +
                   "FooterContent,CopyrightText,FacebookUrl,InstagramUrl,YoutubeUrl," +
-                  "TiktokUrl,ZaloUrl,MetaTitle,MetaDescription,MetaKeywords,FaviconUrl,BannerUrl")]
-            Setting setting)
+                  "TiktokUrl,ZaloUrl,MetaTitle,MetaDescription,MetaKeywords,FaviconUrl")]
+            Setting setting,
+            IFormFile? logoFile,
+            IFormFile? bannerFile)
         {
             var existing = await _db.Settings.FirstOrDefaultAsync();
             if (existing == null) return NotFound();
@@ -52,8 +57,39 @@ namespace quanlybangiay.Controllers.Admin
 
             if (ModelState.IsValid)
             {
+                try
+                {
+                    // Handle logo upload
+                    var newLogo = await FileUploadHelper.SaveAsync(logoFile, _env, "settings");
+                    if (newLogo != null)
+                    {
+                        FileUploadHelper.Delete(_env, existing.LogoUrl);
+                        existing.LogoUrl = newLogo;
+                    }
+                    else
+                    {
+                        existing.LogoUrl = setting.LogoUrl;
+                    }
+
+                    // Handle banner upload
+                    var newBanner = await FileUploadHelper.SaveAsync(bannerFile, _env, "settings");
+                    if (newBanner != null)
+                    {
+                        FileUploadHelper.Delete(_env, existing.BannerUrl);
+                        existing.BannerUrl = newBanner;
+                    }
+                    else
+                    {
+                        existing.BannerUrl = setting.BannerUrl;
+                    }
+                }
+                catch (InvalidOperationException ex)
+                {
+                    TempData["ErrorMessage"] = ex.Message;
+                    return View(existing);
+                }
+
                 existing.ShopName = setting.ShopName;
-                existing.LogoUrl = setting.LogoUrl;
                 existing.Phone = setting.Phone;
                 existing.Hotline = setting.Hotline;
                 existing.Email = setting.Email;
@@ -70,7 +106,6 @@ namespace quanlybangiay.Controllers.Admin
                 existing.MetaDescription = setting.MetaDescription;
                 existing.MetaKeywords = setting.MetaKeywords;
                 existing.FaviconUrl = setting.FaviconUrl;
-                existing.BannerUrl = setting.BannerUrl;
                 existing.UpdatedAt = DateTime.UtcNow;
                 existing.UpdatedBy = GetCurrentUserId();
 

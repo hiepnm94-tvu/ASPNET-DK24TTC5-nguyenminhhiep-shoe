@@ -43,7 +43,32 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-bold">Khách hàng</label>
-                    <div>@(Model.User?.FullName ?? "—") (@(Model.User?.Email ?? "—"))</div>
+                    @if (Model.User != null)
+                    {
+                        <div>@(Model.User.FullName ?? Model.User.Email) <small class="text-muted">(@Model.User.Email)</small></div>
+                    }
+                    else
+                    {
+                        <div>
+                            <span class="badge bg-label-secondary me-1">Khách vãng lai</span><br />
+                            @if (!string.IsNullOrWhiteSpace(Model.GuestName))
+                            {
+                                <div><strong>Tên:</strong> @Model.GuestName</div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Model.GuestEmail))
+                            {
+                                <div><strong>Email:</strong> @Model.GuestEmail</div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Model.GuestPhone))
+                            {
+                                <div><strong>SĐT:</strong> @Model.GuestPhone</div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Model.GuestAddress))
+                            {
+                                <div><strong>Địa chỉ:</strong> @Model.GuestAddress</div>
+                            }
+                        </div>
+                    }
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-bold">Trạng thái đơn</label>
