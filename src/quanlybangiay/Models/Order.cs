@@ -46,6 +46,10 @@ namespace quanlybangiay.Models
 
         public byte? PaymentStatus { get; set; }
 
+        /// <summary>COD | BankTransfer | (future: VNPay, Momo …)</summary>
+        [StringLength(50)]
+        public string? PaymentMethod { get; set; }
+
         public byte? OrderStatus { get; set; }
 
         [StringLength(500)]

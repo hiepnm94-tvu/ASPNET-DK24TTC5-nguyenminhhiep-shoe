@@ -69,6 +69,7 @@ namespace quanlybangiay.Controllers
                 ShippingFee = 0,
                 DiscountAmount = 0,
                 TotalAmount = subtotal,
+                PaymentMethod = model.PaymentMethod,
                 PaymentStatus = 0,
                 OrderStatus = 0,
                 Note = model.Note,

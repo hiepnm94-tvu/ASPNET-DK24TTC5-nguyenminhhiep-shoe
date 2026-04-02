@@ -1,9 +1,12 @@
 @*
   Admin layout (Sneat template trimmed for Razor app)
 *@
+@using System.Security.Claims
+@using Microsoft.EntityFrameworkCore
+@inject quanlybangiay.Data.ApplicationDbContext Db
 <!DOCTYPE html>
 <html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default" data-assets-path="~/admin/assets/" data-template="vertical-menu-template-free">
-  <head>
+<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
@@ -32,179 +35,191 @@
     <!-- Helpers -->
     <script src="~/admin/assets/vendor/js/helpers.js"></script>
     <script src="~/admin/assets/js/config.js"></script>
-  </head>
+</head>
 
-  <body>
+<body>
+    @{
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+        var adminDisplayName = User.Identity?.Name;
+        if (string.IsNullOrWhiteSpace(adminDisplayName))
+        {
+            adminDisplayName = User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value ?? "Người dùng";
+        }
+        var adminRoleName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value ?? "—";
+        string? dbAvatarUrl = null;
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (int.TryParse(userIdStr, out var adminUserId))
+        {
+            dbAvatarUrl = Db.Users.AsNoTracking().Where(u => u.UserId == adminUserId).Select(u => u.AvatarUrl).FirstOrDefault();
+        }
+
+        var defaultAvatarPath = Url.Content("~/admin/assets/img/avatars/1.png");
+        var adminAvatarSrc = string.IsNullOrWhiteSpace(dbAvatarUrl) ? defaultAvatarPath : dbAvatarUrl;
+    }
     <div class="layout-wrapper layout-content-navbar">
-      <div class="layout-container">
-        <!-- Menu -->
-        <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-          <div class="app-brand demo">
-            <a asp-area="Admin" asp-controller="Manage" asp-action="Index" class="app-brand-link">
-               <span class="app-brand-logo demo"></span>
-               <span class="app-brand-text demo menu-text fw-bolder ms-2">Admin Channel</span>
-            </a>
-            <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
-              <i class="bx bx-chevron-left bx-sm align-middle"></i>
-            </a>
-          </div>
-
-          <div class="menu-inner-shadow"></div>
-
-          @{
-            var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
-          }
-
-          <ul class="menu-inner py-1">
-            <li class="menu-item @(currentController == "Manage" ? "active" : "")">
-              <a asp-controller="Manage" asp-action="Index" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                <div data-i18n="Analytics">Tổng quan</div>
-              </a>
-            </li>
-
-            <li class="menu-item @(currentController == "Orders" ? "active" : "")">
-              <a asp-controller="Orders" asp-action="Index" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-cart"></i>
-                <div>Quản lý đơn hàng</div>
-              </a>
-            </li>
-
-            <li class="menu-item @(currentController == "Products" ? "active" : "")">
-              <a asp-controller="Products" asp-action="Index" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-box"></i>
-                <div>Quản lý sản phẩm</div>
-              </a>
-            </li>
-
-            <li class="menu-item @(currentController == "Posts" ? "active" : "")">
-              <a asp-controller="Posts" asp-action="Index" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-news"></i>
-                <div>Quản lý bài viết</div>
-              </a>
-            </li>
-
-            <li class="menu-item @(currentController == "Categories" ? "active" : "")">
-              <a asp-controller="Categories" asp-action="Index" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-category"></i>
-                <div>Quản lý chuyên mục</div>
-              </a>
-            </li>
-
-            <li class="menu-item @(currentController == "Contacts" ? "active" : "")">
-              <a asp-controller="Contacts" asp-action="Index" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-phone"></i>
-                <div>Quản lý liên hệ</div>
-              </a>
-            </li>
-
-            <li class="menu-item @(currentController == "Customers" ? "active" : "")">
-              <a asp-controller="Customers" asp-action="Index" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-user"></i>
-                <div>Quản lý khách hàng</div>
-              </a>
-            </li>
-
-            <li class="menu-item @(currentController == "Settings" ? "active" : "")">
-              <a asp-controller="Settings" asp-action="Index" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-cog"></i>
-                <div>Cài đặt chung</div>
-              </a>
-            </li>
-          </ul>
-        </aside>
-        <!-- / Menu -->
-
-        <!-- Layout container -->
-        <div class="layout-page">
-          <!-- Navbar -->
-          <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
-            <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
-              <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
-                <i class="bx bx-menu bx-sm"></i>
-              </a>
-            </div>
-
-            <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-              <div class="navbar-nav align-items-center">
-                <div class="nav-item d-flex align-items-center">
-                  <i class="bx bx-search fs-4 lh-0"></i>
-                  <input type="text" class="form-control border-0 shadow-none" placeholder="Tìm kiếm..." aria-label="Tìm kiếm..." />
+        <div class="layout-container">
+            <!-- Menu -->
+            <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+                <div class="app-brand demo">
+                    <a asp-area="Admin" asp-controller="Manage" asp-action="Index" class="app-brand-link">
+                        <span class="app-brand-logo demo"></span>
+                        <span class="app-brand-text demo menu-text fw-bolder ms-2">Admin Channel</span>
+                    </a>
+                    <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+                        <i class="bx bx-chevron-left bx-sm align-middle"></i>
+                    </a>
                 </div>
-              </div>
 
-              <ul class="navbar-nav flex-row align-items-center ms-auto">
-                <li class="nav-item navbar-dropdown dropdown-user dropdown">
-                  <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                    <div class="avatar avatar-online">
-                      <img src="~/admin/assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+                <div class="menu-inner-shadow"></div>
+
+                <ul class="menu-inner py-1">
+                    <li class="menu-item @(currentController == "Manage" ? "active" : "")">
+                        <a asp-controller="Manage" asp-action="Index" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                            <div data-i18n="Analytics">Tổng quan</div>
+                        </a>
+                    </li>
+
+                    <li class="menu-item @(currentController == "Orders" ? "active" : "")">
+                        <a asp-controller="Orders" asp-action="Index" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-cart"></i>
+                            <div>Quản lý đơn hàng</div>
+                        </a>
+                    </li>
+
+                    <li class="menu-item @(currentController == "Products" ? "active" : "")">
+                        <a asp-controller="Products" asp-action="Index" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-box"></i>
+                            <div>Quản lý sản phẩm</div>
+                        </a>
+                    </li>
+
+                    <li class="menu-item @(currentController == "Posts" ? "active" : "")">
+                        <a asp-controller="Posts" asp-action="Index" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-news"></i>
+                            <div>Quản lý bài viết</div>
+                        </a>
+                    </li>
+
+                    <li class="menu-item @(currentController == "Categories" ? "active" : "")">
+                        <a asp-controller="Categories" asp-action="Index" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-category"></i>
+                            <div>Quản lý chuyên mục</div>
+                        </a>
+                    </li>
+
+                    <li class="menu-item @(currentController == "Contacts" ? "active" : "")">
+                        <a asp-controller="Contacts" asp-action="Index" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-phone"></i>
+                            <div>Quản lý liên hệ</div>
+                        </a>
+                    </li>
+
+                    <li class="menu-item @(currentController == "Customers" ? "active" : "")">
+                        <a asp-controller="Customers" asp-action="Index" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-user"></i>
+                            <div>Quản lý khách hàng</div>
+                        </a>
+                    </li>
+
+                    <li class="menu-item @(currentController == "Settings" ? "active" : "")">
+                        <a asp-controller="Settings" asp-action="Index" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-cog"></i>
+                            <div>Cài đặt chung</div>
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+            <!-- / Menu -->
+            <!-- Layout container -->
+            <div class="layout-page">
+                <!-- Navbar -->
+                <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
+                    <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+                        <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+                            <i class="bx bx-menu bx-sm"></i>
+                        </a>
                     </div>
-                  </a>
-                  <ul class="dropdown-menu dropdown-menu-end">
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <div class="d-flex">
-                          <div class="flex-shrink-0 me-3">
-                            <div class="avatar avatar-online">
-                              <img src="~/admin/assets/img/avatars/1.png" alt="" class="w-px-40 h-auto rounded-circle" />
+
+                    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+                        <div class="navbar-nav align-items-center">
+                            <div class="nav-item d-flex align-items-center">
+                                <i class="bx bx-search fs-4 lh-0"></i>
+                                <input type="text" class="form-control border-0 shadow-none" placeholder="Tìm kiếm..." aria-label="Tìm kiếm..." />
                             </div>
-                          </div>
-                          <div class="flex-grow-1">
-                            <span class="fw-semibold d-block">Admin</span>
-                            <small class="text-muted">Administrator</small>
-                          </div>
                         </div>
-                      </a>
-                    </li>
-                    <li><div class="dropdown-divider"></div></li>
-                    <li>
-                      <a class="dropdown-item" asp-controller="Home" asp-action="Index">
-                        <i class="bx bx-globe me-2"></i>
-                        <span class="align-middle">Quay lại site</span>
-                      </a>
-                    </li>
-                    <li>
-                      <div class="dropdown-divider"></div>
-                    </li>
-                    <li>
-                      <form method="post" asp-controller="Account" asp-action="Logout" asp-area="" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="dropdown-item btn btn-link">
-                          <i class="bx bx-power-off me-2"></i>
-                          <span class="align-middle">Đăng xuất</span>
-                        </button>
-                      </form>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
+
+                        <ul class="navbar-nav flex-row align-items-center ms-auto">
+                            <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" title="@adminDisplayName">
+                                    <div class="avatar avatar-online">
+                                        <img src="@adminAvatarSrc" alt="@adminDisplayName" class="w-px-40 h-auto rounded-circle" />
+                                    </div>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item" href="javascript:void(0);">
+                                            <div class="d-flex">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <div class="avatar avatar-online">
+                                                        <img src="@adminAvatarSrc" alt="" class="w-px-40 h-auto rounded-circle" />
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <span class="fw-semibold d-block">@adminDisplayName</span>
+                                                    <small class="text-muted">@adminRoleName</small>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li><div class="dropdown-divider"></div></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Index">
+                                            <i class="bx bx-globe me-2"></i>
+                                            <span class="align-middle">Quay lại site</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <div class="dropdown-divider"></div>
+                                    </li>
+                                    <li>
+                                        <form method="post" asp-controller="Account" asp-action="Logout" asp-area="" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="dropdown-item btn btn-link">
+                                                <i class="bx bx-power-off me-2"></i>
+                                                <span class="align-middle">Đăng xuất</span>
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+
+                <!-- / Navbar -->
+                <!-- Content wrapper -->
+                <div class="content-wrapper">
+                    @await Html.PartialAsync("~/Areas/Admin/Views/Shared/_Notification.cshtml")
+                    <div class="container-xxl flex-grow-1 container-p-y">
+                        @RenderBody()
+                    </div>
+
+                    <footer class="content-footer footer bg-footer-theme">
+                        <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
+                            <div class="mb-2 mb-md-0">Đề tài: Quản lý bán giày - SVTH: Nguyễn Minh Hiệp</div>
+                        </div>
+                    </footer>
+
+                    <div class="content-backdrop fade"></div>
+                </div>
+                <!-- Content wrapper -->
             </div>
-          </nav>
-
-          <!-- / Navbar -->
-
-          <!-- Content wrapper -->
-          <div class="content-wrapper">
-            @await Html.PartialAsync("~/Areas/Admin/Views/Shared/_Notification.cshtml")
-            <div class="container-xxl flex-grow-1 container-p-y">
-              @RenderBody()
-            </div>
-
-            <footer class="content-footer footer bg-footer-theme">
-              <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
-                <div class="mb-2 mb-md-0">Đề tài: Quản lý bán giày - SVTH: Nguyễn Minh Hiệp</div>
-              </div>
-            </footer>
-
-            <div class="content-backdrop fade"></div>
-          </div>
-          <!-- Content wrapper -->
+            <!-- / Layout page -->
         </div>
-        <!-- / Layout page -->
-      </div>
 
-      <!-- Overlay -->
-      <div class="layout-overlay layout-menu-toggle"></div>
+        <!-- Overlay -->
+        <div class="layout-overlay layout-menu-toggle"></div>
     </div>
 
     <!-- Core JS -->
@@ -225,5 +240,5 @@
     <script src="~/admin/js/image-upload.js"></script>
 
     @RenderSection("Scripts", required: false)
-  </body>
+</body>
 </html>

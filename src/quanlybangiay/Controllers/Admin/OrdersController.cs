@@ -64,19 +64,20 @@ namespace quanlybangiay.Controllers.Admin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, byte? OrderStatus, byte? PaymentStatus, string Note)
+        public async Task<IActionResult> Edit(long id, byte? OrderStatus, byte? PaymentStatus, string? PaymentMethod, string? Note)
         {
             var order = await _db.Orders.FindAsync(id);
             if (order == null) return NotFound();
 
             order.OrderStatus = OrderStatus;
             order.PaymentStatus = PaymentStatus;
+            order.PaymentMethod = PaymentMethod;
             order.Note = Note;
             order.UpdatedAt = DateTime.UtcNow;
 
             await _db.SaveChangesAsync();
             TempData["SuccessMessage"] = "Cập nhật đơn hàng thành công!";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         [HttpPost]
