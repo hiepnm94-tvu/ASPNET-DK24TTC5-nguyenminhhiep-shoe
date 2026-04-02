@@ -9,7 +9,7 @@
     <h2 class="card-header fw-bold py-3 mb-4">Sửa sản phẩm</h2>
 
     <div class="card-body">
-        <form asp-area="Admin" asp-controller="Products" asp-action="Edit" method="post">
+        <form asp-area="Admin" asp-controller="Products" asp-action="Edit" method="post" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="ProductId" />
 
@@ -61,8 +61,19 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Ảnh đại diện (URL)</label>
-                <input asp-for="ThumbnailUrl" class="form-control" placeholder="Vui lòng nhập URL ảnh" />
+                <label class="form-label">Ảnh đại diện</label>
+                @if (!string.IsNullOrWhiteSpace(Model.ThumbnailUrl))
+                {
+                    <div class="mb-2">
+                        <img id="thumb-current" src="@Model.ThumbnailUrl" style="max-height:100px;max-width:100%;border-radius:6px;" class="border p-1" />
+                        <small class="text-muted d-block mt-1">Ảnh hiện tại — tải ảnh mới để thay thế</small>
+                    </div>
+                }
+                <input type="hidden" asp-for="ThumbnailUrl" />
+                <input type="file" name="thumbnailFile" class="form-control" accept="image/*"
+                       onchange="previewImg(this,'thumb-preview-edit')" />
+                <small class="text-muted">Định dạng: jpg, jpeg, png, gif, webp. Tối đa 5MB.</small>
+                <div id="thumb-preview-edit" class="mt-2"></div>
             </div>
 
             <div class="mb-3">

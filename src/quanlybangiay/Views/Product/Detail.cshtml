@@ -1,0 +1,152 @@
+@model quanlybangiay.Models.Product
+@{
+    ViewData["Title"] = Model.ProductName;
+    var variants = ViewBag.Variants as List<ProductVariant> ?? new List<ProductVariant>();
+    var relatedProducts = ViewBag.RelatedProducts as List<Product> ?? new List<Product>();
+    var hasDiscount = Model.DiscountPrice.HasValue && Model.DiscountPrice.Value > 0
+        && Model.DiscountPrice.Value < Model.BasePrice;
+    var displayPrice = hasDiscount ? Model.DiscountPrice!.Value : Model.BasePrice;
+}
+
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <p class="bread">
+                    <span><a asp-controller="Home" asp-action="Index">Trang chủ</a></span> /
+                    @if (Model.Category != null)
+                    {
+                        <span><a asp-controller="Product" asp-action="Category" asp-route-id="@Model.CategoryId">@Model.Category.CategoryName</a></span>
+                        <text> / </text>
+                    }
+                    <span>@Model.ProductName</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="colorlib-product">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="product-detail-img" style="text-align:center;">
+                    <img src="@(Model.ThumbnailUrl ?? "/images/no-image.png")" class="img-fluid" alt="@Model.ProductName" style="max-height:500px;">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="product-detail-content">
+                    <h2>@Model.ProductName</h2>
+                    @if (!string.IsNullOrWhiteSpace(Model.Brand))
+                    {
+                        <p class="text-muted mb-2">Thương hiệu: <strong>@Model.Brand</strong></p>
+                    }
+                    @if (Model.Category != null)
+                    {
+                        <p class="text-muted mb-2">Danh mục: <a asp-controller="Product" asp-action="Category" asp-route-id="@Model.CategoryId">@Model.Category.CategoryName</a></p>
+                    }
+
+                    <div class="product-price mb-4">
+                        @if (hasDiscount)
+                        {
+                            <span class="price" style="font-size:28px;color:#f85a40;">@Model.DiscountPrice!.Value.ToString("N0") đ</span>
+                            <span class="price" style="text-decoration:line-through;opacity:0.55;font-size:18px;margin-left:10px;">@Model.BasePrice.ToString("N0") đ</span>
+                        }
+                        else
+                        {
+                            <span class="price" style="font-size:28px;color:#f85a40;">@Model.BasePrice.ToString("N0") đ</span>
+                        }
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.ShortDescription))
+                    {
+                        <p class="mb-3">@Model.ShortDescription</p>
+                    }
+
+                    @if (variants.Any())
+                    {
+                        <form method="post" asp-controller="Cart" asp-action="Add">
+                            <input type="hidden" name="productId" value="@Model.ProductId" />
+                            <div class="form-group mb-3">
+                                <label><strong>Chọn phiên bản:</strong></label>
+                                <select name="variantId" class="form-control" style="max-width:300px;" required>
+                                    @foreach (var v in variants)
+                                    {
+                                        var label = $"Size {v.SizeValue}";
+                                        if (!string.IsNullOrWhiteSpace(v.ColorName))
+                                            label += $" - {v.ColorName}";
+                                        if (v.AdditionalPrice.HasValue && v.AdditionalPrice > 0)
+                                            label += $" (+{v.AdditionalPrice.Value.ToString("N0")} đ)";
+                                        label += $" (Còn {v.StockQty})";
+                                        <option value="@v.VariantId">@label</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label><strong>Số lượng:</strong></label>
+                                <input type="number" name="quantity" value="1" min="1" max="100" class="form-control" style="max-width:100px;">
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="icon-shopping-cart"></i> Thêm vào giỏ hàng
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <p class="text-danger">Sản phẩm hiện đang hết hàng.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <div class="row mt-5">
+                <div class="col-12">
+                    <h3>Mô tả sản phẩm</h3>
+                    <hr />
+                    <div class="product-description">
+                        @Html.Raw(Model.Description)
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@if (relatedProducts.Any())
+{
+    <div class="colorlib-product">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-8 offset-sm-2 text-center colorlib-heading colorlib-heading-sm">
+                    <h2>Sản phẩm liên quan</h2>
+                </div>
+            </div>
+            <div class="row row-pb-md">
+                @foreach (var p in relatedProducts)
+                {
+                    <div class="col-md-3 col-lg-3 mb-4 text-center">
+                        <div class="product-entry border">
+                            <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.ProductId" class="prod-img">
+                                <img src="@(p.ThumbnailUrl ?? "/images/no-image.png")" class="img-fluid" alt="@p.ProductName">
+                            </a>
+                            <div class="desc">
+                                <h2><a asp-controller="Product" asp-action="Detail" asp-route-id="@p.ProductId">@p.ProductName</a></h2>
+                                @if (p.DiscountPrice.HasValue && p.DiscountPrice.Value < p.BasePrice)
+                                {
+                                    <span class="price">@p.DiscountPrice.Value.ToString("N0") đ</span>
+                                    <span class="price" style="text-decoration:line-through;opacity:0.55;font-size:15px;">@p.BasePrice.ToString("N0") đ</span>
+                                }
+                                else
+                                {
+                                    <span class="price">@p.BasePrice.ToString("N0") đ</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}

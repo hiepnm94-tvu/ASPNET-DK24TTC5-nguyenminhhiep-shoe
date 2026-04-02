@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using quanlybangiay.Data;
 using quanlybangiay.Models;
 using System.Diagnostics;
 
@@ -6,8 +8,30 @@ namespace quanlybangiay.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly ApplicationDbContext _db;
+
+        public HomeController(ApplicationDbContext db)
         {
+            _db = db;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var categories = await _db.Categories
+                .Where(c => c.IsActive == true)
+                .OrderBy(c => c.CategoryName)
+                .ToListAsync();
+
+            var bestSellers = await _db.Products
+                .Include(p => p.Category)
+                .Where(p => p.Status == 1)
+                .OrderByDescending(p => p.CreatedAt)
+                .Take(8)
+                .ToListAsync();
+
+            ViewBag.Categories = categories;
+            ViewBag.BestSellers = bestSellers;
+
             return View();
         }
 

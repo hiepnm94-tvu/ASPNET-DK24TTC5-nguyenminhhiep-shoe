@@ -1,0 +1,187 @@
+@model List<quanlybangiay.Models.ViewModels.CartItem>
+@{
+    ViewData["Title"] = "Giỏ hàng";
+    var relatedProducts = ViewBag.RelatedProducts as List<Product> ?? new List<Product>();
+    var hasItems = Model != null && Model.Count > 0;
+    var subtotal = hasItems ? Model!.Sum(c => c.LineTotal) : 0m;
+    var shipping = 0m;
+    var grandTotal = subtotal + shipping;
+}
+
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <p class="bread">
+                    <span><a asp-controller="Home" asp-action="Index">Trang chủ</a></span>
+                    <span>Giỏ hàng</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="colorlib-product">
+    <div class="container">
+        <div class="row row-pb-lg justify-content-center">
+            <div class="col-md-10">
+                <div class="process-wrap">
+                    <div class="process text-center active">
+                        <p><span>01</span></p>
+                        <h3>Giỏ hàng</h3>
+                    </div>
+                    <div class="process text-center">
+                        <p><span>02</span></p>
+                        <h3>Thanh toán</h3>
+                    </div>
+                    <div class="process text-center">
+                        <p><span>03</span></p>
+                        <h3>Hoàn tất</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (!hasItems)
+        {
+            <div class="row">
+                <div class="col-12 text-center py-5">
+                    <p class="lead mb-4">Giỏ hàng trống</p>
+                    <p><a asp-controller="Product" asp-action="Category" class="btn btn-primary">Tiếp tục mua sắm</a></p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row row-pb-lg">
+                <div class="col-md-12">
+                    <div class="product-name d-flex">
+                        <div class="one-forth text-left">
+                            <span>Chi tiết sản phẩm</span>
+                        </div>
+                        <div class="one-eight text-center">
+                            <span>Giá tiền</span>
+                        </div>
+                        <div class="one-eight text-center">
+                            <span>Số lượng</span>
+                        </div>
+                        <div class="one-eight text-center">
+                            <span>Tổng</span>
+                        </div>
+                        <div class="one-eight text-center">
+                            <span>Xóa</span>
+                        </div>
+                    </div>
+                    @foreach (var item in Model!)
+                    {
+                        var thumb = string.IsNullOrWhiteSpace(item.ThumbnailUrl)
+                            ? "/images/no-image.png"
+                            : item.ThumbnailUrl;
+                        <div class="product-cart d-flex">
+                            <div class="one-forth">
+                                <div class="product-img" style="background-image: url('@thumb');"></div>
+                                <div class="display-tc">
+                                    <h3>@item.ProductName</h3>
+                                    <p>Size: @item.SizeValue | Color: @item.ColorName</p>
+                                </div>
+                            </div>
+                            <div class="one-eight text-center">
+                                <div class="display-tc"><span class="price">@item.UnitPrice.ToString("N0") đ</span></div>
+                            </div>
+                            <div class="one-eight text-center">
+                                <div class="display-tc">
+                                    <form method="post" asp-controller="Cart" asp-action="Update">
+                                        <input type="hidden" name="variantId" value="@item.VariantId" />
+                                        <input type="text" name="quantity" class="form-control input-number text-center" value="@item.Quantity" min="1" max="100" onchange="this.form.submit()">
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="one-eight text-center">
+                                <div class="display-tc"><span class="price">@item.LineTotal.ToString("N0") đ</span></div>
+                            </div>
+                            <div class="one-eight text-center">
+                                <div class="display-tc">
+                                    <form method="post" asp-controller="Cart" asp-action="Remove">
+                                        <input type="hidden" name="variantId" value="@item.VariantId" />
+                                        <button type="submit" class="closed" style="border:none;background:none;"></button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="total-wrap">
+                <div class="row">
+                    <div class="col-sm-8"></div>
+                    <div class="col-sm-4 text-center">
+                        <div class="total">
+                            <div class="sub">
+                                <p><span>Tạm tính:</span> <span>@subtotal.ToString("N0") đ</span></p>
+                                <p><span>Phí vận chuyển:</span> <span>@shipping.ToString("N0") đ</span></p>
+                            </div>
+                            <div class="grand-total">
+                                <p><span><strong>Tổng cộng:</strong></span> <span>@grandTotal.ToString("N0") đ</span></p>
+                            </div>
+                        </div>
+                        <p><a asp-controller="Checkout" asp-action="Index" class="btn btn-primary">Thanh toán</a></p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@if (relatedProducts.Count > 0)
+{
+    <div class="colorlib-product">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-8 offset-sm-2 text-center colorlib-heading">
+                    <h2>Sản phẩm liên quan</h2>
+                </div>
+            </div>
+            <div class="row row-pb-md">
+                @{
+                    var i = 0;
+                }
+                @foreach (var product in relatedProducts)
+                {
+                    i++;
+                    var thumb = string.IsNullOrWhiteSpace(product.ThumbnailUrl)
+                        ? "/images/no-image.png"
+                        : product.ThumbnailUrl;
+                    var hasDiscount = product.DiscountPrice.HasValue && product.DiscountPrice.Value > 0
+                        && product.DiscountPrice.Value < product.BasePrice;
+                    <div class="col-lg-3 mb-4 text-center">
+                        <div class="product-entry border">
+                            <a asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductId" class="prod-img">
+                                <img src="@thumb" class="img-fluid" alt="@product.ProductName">
+                            </a>
+                            <div class="desc">
+                                <h2><a asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductId">@product.ProductName</a></h2>
+                                <span class="price">
+                                    @if (hasDiscount)
+                                    {
+                                        <del>@product.BasePrice.ToString("N0") đ</del>
+                                        <text> </text>
+                                        @product.DiscountPrice!.Value.ToString("N0")<text> đ</text>
+                                    }
+                                    else
+                                    {
+                                        @product.BasePrice.ToString("N0")<text> đ</text>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    @if (i % 4 == 0 && i < relatedProducts.Count)
+                    {
+                        <div class="w-100"></div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+}

@@ -13,11 +13,24 @@ namespace quanlybangiay.Models
         [Required, StringLength(20)]
         public string OrderCode { get; set; } = string.Empty;
 
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
 
-        public int AddressId { get; set; }
+        public int? AddressId { get; set; }
 
         public int? PromotionId { get; set; }
+
+        // Guest order info (used when UserId is null)
+        [StringLength(100)]
+        public string? GuestName { get; set; }
+
+        [StringLength(150)]
+        public string? GuestEmail { get; set; }
+
+        [StringLength(20)]
+        public string? GuestPhone { get; set; }
+
+        [StringLength(500)]
+        public string? GuestAddress { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Subtotal { get; set; }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using quanlybangiay.Data;
+using quanlybangiay.Helpers;
 using quanlybangiay.Models;
 
 namespace quanlybangiay.Controllers.Admin
@@ -12,10 +13,12 @@ namespace quanlybangiay.Controllers.Admin
     public class PostsController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly IWebHostEnvironment _env;
 
-        public PostsController(ApplicationDbContext db)
+        public PostsController(ApplicationDbContext db, IWebHostEnvironment env)
         {
             _db = db;
+            _env = env;
         }
 
         public async Task<IActionResult> Index(int page = 1, int pageSize = 20)
@@ -53,15 +56,25 @@ namespace quanlybangiay.Controllers.Admin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Title,Slug,ShortDescription,Content,ThumbnailUrl,IsActive")] Post post)
+        public async Task<IActionResult> Create(
+            [Bind("Title,Slug,ShortDescription,Content,IsActive")] Post post,
+            IFormFile? thumbnailFile)
         {
             if (ModelState.IsValid)
             {
-                post.CreatedBy = GetCurrentUserId();
-                _db.Add(post);
-                await _db.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Tạo bài viết thành công!";
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    post.ThumbnailUrl = await FileUploadHelper.SaveAsync(thumbnailFile, _env, "posts");
+                    post.CreatedBy = GetCurrentUserId();
+                    _db.Add(post);
+                    await _db.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Tạo bài viết thành công!";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError("thumbnailFile", ex.Message);
+                }
             }
             TempData["ErrorMessage"] = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
             return View(post);
@@ -77,7 +90,10 @@ namespace quanlybangiay.Controllers.Admin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PostId,Title,Slug,ShortDescription,Content,ThumbnailUrl,IsActive")] Post post)
+        public async Task<IActionResult> Edit(
+            int id,
+            [Bind("PostId,Title,Slug,ShortDescription,Content,ThumbnailUrl,IsActive")] Post post,
+            IFormFile? thumbnailFile)
         {
             if (id != post.PostId) return NotFound();
 
@@ -89,8 +105,23 @@ namespace quanlybangiay.Controllers.Admin
                     post.CreatedBy = existing?.CreatedBy;
                     post.UpdatedBy = GetCurrentUserId();
                     post.UpdatedAt = DateTime.UtcNow;
+
+                    var newPath = await FileUploadHelper.SaveAsync(thumbnailFile, _env, "posts");
+                    if (newPath != null)
+                    {
+                        FileUploadHelper.Delete(_env, post.ThumbnailUrl);
+                        post.ThumbnailUrl = newPath;
+                    }
+
                     _db.Update(post);
                     await _db.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Cập nhật bài viết thành công!";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError("thumbnailFile", ex.Message);
+                    return View(post);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -98,8 +129,6 @@ namespace quanlybangiay.Controllers.Admin
                         return NotFound();
                     throw;
                 }
-                TempData["SuccessMessage"] = "Cập nhật bài viết thành công!";
-                return RedirectToAction(nameof(Index));
             }
             TempData["ErrorMessage"] = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
             return View(post);

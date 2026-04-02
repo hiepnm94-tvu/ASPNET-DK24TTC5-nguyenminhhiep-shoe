@@ -1,0 +1,168 @@
+@model quanlybangiay.Models.ViewModels.CheckoutViewModel
+@using quanlybangiay.Models.ViewModels
+@{
+    ViewData["Title"] = "Thanh toán";
+    var cart = ViewBag.Cart as IList<CartItem> ?? new List<CartItem>();
+    var subtotal = ViewBag.Subtotal is decimal s ? s : 0m;
+    var shipping = 0m;
+    var orderTotal = subtotal + shipping;
+}
+
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <p class="bread">
+                    <span><a asp-controller="Home" asp-action="Index">Trang chủ</a></span>
+                    <span>Thanh toán</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="colorlib-product">
+    <div class="container">
+        <div class="row row-pb-lg">
+            <div class="col-sm-10 offset-md-1">
+                <div class="process-wrap">
+                    <div class="process text-center active">
+                        <p><span>01</span></p>
+                        <h3>Giỏ hàng</h3>
+                    </div>
+                    <div class="process text-center active">
+                        <p><span>02</span></p>
+                        <h3>Thanh toán</h3>
+                    </div>
+                    <div class="process text-center">
+                        <p><span>03</span></p>
+                        <h3>Hoàn tất</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form asp-controller="Checkout" asp-action="PlaceOrder" method="post" asp-antiforgery="false">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="colorlib-form">
+                        <h2>Thông tin giao hàng</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="FirstName" class="control-label">Họ</label>
+                                    <input asp-for="FirstName" class="form-control" placeholder="Họ" />
+                                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="LastName" class="control-label">Tên</label>
+                                    <input asp-for="LastName" class="form-control" placeholder="Tên" />
+                                    <span asp-validation-for="LastName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label asp-for="Address" class="control-label">Địa chỉ</label>
+                                    <input asp-for="Address" class="form-control" placeholder="Số nhà, đường" />
+                                    <span asp-validation-for="Address" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="City" class="control-label">Tỉnh / Thành phố</label>
+                                    <input asp-for="City" class="form-control" placeholder="Tỉnh / Thành phố" />
+                                    <span asp-validation-for="City" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="District" class="control-label">Quận / Huyện</label>
+                                    <input asp-for="District" class="form-control" placeholder="Quận / Huyện" />
+                                    <span asp-validation-for="District" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Email" class="control-label">Email</label>
+                                    <input asp-for="Email" class="form-control" placeholder="Email" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Phone" class="control-label">Số điện thoại</label>
+                                    <input asp-for="Phone" class="form-control" placeholder="Số điện thoại" />
+                                    <span asp-validation-for="Phone" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label asp-for="Note" class="control-label">Ghi chú đơn hàng</label>
+                                    <textarea asp-for="Note" class="form-control" rows="3" placeholder="Ghi chú (không bắt buộc)"></textarea>
+                                    <span asp-validation-for="Note" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="total-wrap">
+                        <div class="cart-detail">
+                            <h2>Tóm tắt giỏ hàng</h2>
+                            <ul>
+                                @foreach (var item in cart)
+                                {
+                                    <li>
+                                        <span>@item.ProductName × @item.Quantity</span>
+                                        <span>@item.LineTotal.ToString("N0") đ</span>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                        <div class="total">
+                            <div class="sub">
+                                <p>
+                                    <span>Tạm tính</span>
+                                    <span>@subtotal.ToString("N0") đ</span>
+                                </p>
+                                <p>
+                                    <span>Phí vận chuyển</span>
+                                    <span>@shipping.ToString("N0") đ</span>
+                                </p>
+                            </div>
+                            <div class="grand-total">
+                                <p>
+                                    <span><strong>Tổng cộng</strong></span>
+                                    <span><strong>@orderTotal.ToString("N0") đ</strong></span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="colorlib-form mt-3">
+                            <h2 class="mb-3">Phương thức thanh toán</h2>
+                            <div class="form-group">
+                                <div class="custom-control custom-radio mb-2">
+                                    <input type="radio" asp-for="PaymentMethod" value="COD" id="payCod" class="custom-control-input" />
+                                    <label class="custom-control-label" for="payCod">Thanh toán khi nhận hàng (COD)</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" asp-for="PaymentMethod" value="BankTransfer" id="payBank" class="custom-control-input" />
+                                    <label class="custom-control-label" for="payBank">Chuyển khoản ngân hàng</label>
+                                </div>
+                                <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Đặt hàng</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

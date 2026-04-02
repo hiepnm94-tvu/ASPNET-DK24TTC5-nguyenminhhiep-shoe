@@ -7,7 +7,7 @@
 <div class="card mb-4">
     <h2 class="card-header fw-bold py-3 mb-4">Tạo khách hàng</h2>
     <div class="card-body">
-        <form asp-area="Admin" asp-controller="Customers" asp-action="Create" method="post">
+        <form asp-area="Admin" asp-controller="Customers" asp-action="Create" method="post" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
 
             <div class="mb-3">
@@ -56,8 +56,11 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Ảnh đại diện (URL)</label>
-                <input asp-for="AvatarUrl" class="form-control" placeholder="Vui lòng nhập URL ảnh đại diện" />
+                <label class="form-label">Ảnh đại diện</label>
+                <input type="file" name="avatarFile" class="form-control" accept="image/*"
+                       onchange="previewImg(this,'avatar-preview-create')" />
+                <small class="text-muted">Định dạng: jpg, jpeg, png, gif, webp. Tối đa 5MB.</small>
+                <div id="avatar-preview-create" class="mt-2"></div>
             </div>
 
             <div class="mb-3">

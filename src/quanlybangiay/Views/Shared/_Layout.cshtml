@@ -1,4 +1,4 @@
-﻿<!DOCTYPE HTML>
+<!DOCTYPE HTML>
 <html>
     <head>
     <meta charset="utf-8" />
@@ -6,8 +6,8 @@
     <title>@ViewData["Title"] - quanlybangiay</title>
 
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Rokkitt:100,300,400,700" rel="stylesheet">
 
-    <!-- Template CSS (adjust paths to wwwroot) -->
     <link rel="stylesheet" href="~/css/animate.css" />
     <link rel="stylesheet" href="~/css/icomoon.css" />
     <link rel="stylesheet" href="~/css/ionicons.min.css" />
@@ -25,12 +25,11 @@
         <div class="colorlib-loader"></div>
 
         <div id="page">
-            @Html.Partial("_Header")
+            @await Html.PartialAsync("_Header")
 
-            <!-- Render page-specific content here -->
             @RenderBody()
 
-            @Html.Partial("_Footer")
+            @await Html.PartialAsync("_Footer")
         </div>
 
         <div class="gototop js-top">

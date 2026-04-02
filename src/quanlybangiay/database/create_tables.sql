@@ -121,9 +121,13 @@ BEGIN
     CREATE TABLE dbo.Orders (
         OrderId BIGINT IDENTITY(1,1) PRIMARY KEY,
         OrderCode VARCHAR(20) NOT NULL,
-        UserId INT NOT NULL,
-        AddressId INT NOT NULL,
+        UserId INT NULL,
+        AddressId INT NULL,
         PromotionId INT NULL,
+        GuestName NVARCHAR(100) NULL,
+        GuestEmail NVARCHAR(150) NULL,
+        GuestPhone NVARCHAR(20) NULL,
+        GuestAddress NVARCHAR(500) NULL,
         Subtotal DECIMAL(18,2) NOT NULL DEFAULT 0,
         ShippingFee DECIMAL(18,2) NOT NULL DEFAULT 0,
         DiscountAmount DECIMAL(18,2) NOT NULL DEFAULT 0,
@@ -138,6 +142,62 @@ BEGIN
         CONSTRAINT FK_Orders_Addresses FOREIGN KEY (AddressId) REFERENCES dbo.Addresses(AddressId),
         CONSTRAINT FK_Orders_Promotions FOREIGN KEY (PromotionId) REFERENCES dbo.Promotions(PromotionId)
     );
+END
+
+-- Orders: allow guest checkout (existing databases)
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Orders]') AND type in (N'U'))
+BEGIN
+    -- Make UserId nullable (drop FK first, alter column, re-add FK)
+    IF EXISTS (
+        SELECT 1 FROM sys.foreign_keys
+        WHERE name = 'FK_Orders_Users' AND parent_object_id = OBJECT_ID('dbo.Orders')
+    )
+    BEGIN
+        -- Check if column is currently NOT NULL
+        IF EXISTS (
+            SELECT 1 FROM sys.columns
+            WHERE object_id = OBJECT_ID('dbo.Orders')
+              AND name = 'UserId'
+              AND is_nullable = 0
+        )
+        BEGIN
+            ALTER TABLE dbo.Orders DROP CONSTRAINT FK_Orders_Users;
+            ALTER TABLE dbo.Orders ALTER COLUMN UserId INT NULL;
+            ALTER TABLE dbo.Orders ADD CONSTRAINT FK_Orders_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(UserId);
+        END
+    END
+
+    -- Make AddressId nullable
+    IF EXISTS (
+        SELECT 1 FROM sys.foreign_keys
+        WHERE name = 'FK_Orders_Addresses' AND parent_object_id = OBJECT_ID('dbo.Orders')
+    )
+    BEGIN
+        IF EXISTS (
+            SELECT 1 FROM sys.columns
+            WHERE object_id = OBJECT_ID('dbo.Orders')
+              AND name = 'AddressId'
+              AND is_nullable = 0
+        )
+        BEGIN
+            ALTER TABLE dbo.Orders DROP CONSTRAINT FK_Orders_Addresses;
+            ALTER TABLE dbo.Orders ALTER COLUMN AddressId INT NULL;
+            ALTER TABLE dbo.Orders ADD CONSTRAINT FK_Orders_Addresses FOREIGN KEY (AddressId) REFERENCES dbo.Addresses(AddressId);
+        END
+    END
+
+    -- Add guest info columns if not present
+    IF COL_LENGTH('dbo.Orders', 'GuestName') IS NULL
+        ALTER TABLE dbo.Orders ADD GuestName NVARCHAR(100) NULL;
+
+    IF COL_LENGTH('dbo.Orders', 'GuestEmail') IS NULL
+        ALTER TABLE dbo.Orders ADD GuestEmail NVARCHAR(150) NULL;
+
+    IF COL_LENGTH('dbo.Orders', 'GuestPhone') IS NULL
+        ALTER TABLE dbo.Orders ADD GuestPhone NVARCHAR(20) NULL;
+
+    IF COL_LENGTH('dbo.Orders', 'GuestAddress') IS NULL
+        ALTER TABLE dbo.Orders ADD GuestAddress NVARCHAR(500) NULL;
 END
 
 -- OrderItems
@@ -246,6 +306,16 @@ BEGIN
         UpdatedBy INT NULL,
         CONSTRAINT FK_Contacts_UpdatedBy FOREIGN KEY (UpdatedBy) REFERENCES dbo.Users(UserId)
     );
+END
+
+-- Contacts: add UpdatedBy for existing databases
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Contacts]') AND type in (N'U'))
+BEGIN
+    IF COL_LENGTH('dbo.Contacts', 'UpdatedBy') IS NULL
+    BEGIN
+        ALTER TABLE dbo.Contacts ADD UpdatedBy INT NULL;
+        ALTER TABLE dbo.Contacts ADD CONSTRAINT FK_Contacts_UpdatedBy FOREIGN KEY (UpdatedBy) REFERENCES dbo.Users(UserId);
+    END
 END
 
 PRINT 'Tables created (if not existed)';

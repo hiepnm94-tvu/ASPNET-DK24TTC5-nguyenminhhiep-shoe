@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using quanlybangiay.Data;
+using quanlybangiay.Helpers;
 using quanlybangiay.Models;
 using System.Security.Cryptography;
 using System.Text;
@@ -14,10 +15,12 @@ namespace quanlybangiay.Controllers.Admin
     public class CustomersController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly IWebHostEnvironment _env;
 
-        public CustomersController(ApplicationDbContext db)
+        public CustomersController(ApplicationDbContext db, IWebHostEnvironment env)
         {
             _db = db;
+            _env = env;
         }
 
         public async Task<IActionResult> Index(int page = 1, int pageSize = 20)
@@ -54,18 +57,29 @@ namespace quanlybangiay.Controllers.Admin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("RoleId,FullName,Email,Phone,Gender,DateOfBirth,AvatarUrl,IsActive")] User user, string? Password)
+        public async Task<IActionResult> Create(
+            [Bind("RoleId,FullName,Email,Phone,Gender,DateOfBirth,IsActive")] User user,
+            string? Password,
+            IFormFile? avatarFile)
         {
             if (ModelState.IsValid)
             {
-                if (!string.IsNullOrWhiteSpace(Password))
+                try
                 {
-                    user.PasswordHash = ComputeMd5(Password);
+                    user.AvatarUrl = await FileUploadHelper.SaveAsync(avatarFile, _env, "users");
+
+                    if (!string.IsNullOrWhiteSpace(Password))
+                        user.PasswordHash = ComputeMd5(Password);
+
+                    _db.Add(user);
+                    await _db.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Tạo khách hàng thành công!";
+                    return RedirectToAction(nameof(Index));
                 }
-                _db.Add(user);
-                await _db.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Tạo khách hàng thành công!";
-                return RedirectToAction(nameof(Index));
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError("avatarFile", ex.Message);
+                }
             }
             TempData["ErrorMessage"] = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
             ViewBag.Roles = new SelectList(
@@ -88,7 +102,11 @@ namespace quanlybangiay.Controllers.Admin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserId,RoleId,FullName,Email,Phone,Gender,DateOfBirth,AvatarUrl,IsActive")] User user, string? Password)
+        public async Task<IActionResult> Edit(
+            int id,
+            [Bind("UserId,RoleId,FullName,Email,Phone,Gender,DateOfBirth,AvatarUrl,IsActive")] User user,
+            string? Password,
+            IFormFile? avatarFile)
         {
             if (id != user.UserId) return NotFound();
 
@@ -104,10 +122,27 @@ namespace quanlybangiay.Controllers.Admin
                     else
                         user.PasswordHash = existing.PasswordHash;
 
+                    var newPath = await FileUploadHelper.SaveAsync(avatarFile, _env, "users");
+                    if (newPath != null)
+                    {
+                        FileUploadHelper.Delete(_env, user.AvatarUrl);
+                        user.AvatarUrl = newPath;
+                    }
+
                     user.CreatedAt = existing.CreatedAt;
                     user.UpdatedAt = DateTime.UtcNow;
                     _db.Update(user);
                     await _db.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Cập nhật khách hàng thành công!";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError("avatarFile", ex.Message);
+                    ViewBag.Roles = new SelectList(
+                        await _db.Roles.OrderBy(r => r.RoleName).ToListAsync(),
+                        "RoleId", "RoleName", user.RoleId);
+                    return View(user);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -115,8 +150,6 @@ namespace quanlybangiay.Controllers.Admin
                         return NotFound();
                     throw;
                 }
-                TempData["SuccessMessage"] = "Cập nhật khách hàng thành công!";
-                return RedirectToAction(nameof(Index));
             }
             TempData["ErrorMessage"] = "Dữ liệu không hợp lệ, vui lòng kiểm tra lại.";
             ViewBag.Roles = new SelectList(
