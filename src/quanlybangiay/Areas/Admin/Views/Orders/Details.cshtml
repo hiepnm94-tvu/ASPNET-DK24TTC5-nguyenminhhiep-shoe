@@ -77,9 +77,24 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Thanh toán</label>
+                    <label class="form-label fw-bold">Trạng thái thanh toán</label>
                     <div>
-                        <span class="badge @(Model.PaymentStatus == 1 ? "bg-label-success" : "bg-label-warning")">@PaymentStatusLabel(Model.PaymentStatus)</span>
+                        <span class="badge @(Model.PaymentStatus == 1 ? "bg-label-success" : Model.PaymentStatus == 2 ? "bg-label-secondary" : "bg-label-warning")">@PaymentStatusLabel(Model.PaymentStatus)</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Phương thức thanh toán</label>
+                    <div>
+                        @{
+                            var pmLabel = Model.PaymentMethod switch
+                            {
+                                "COD" => "Thanh toán khi nhận hàng (COD)",
+                                "BankTransfer" => "Chuyển khoản ngân hàng",
+                                null or "" => "—",
+                                _ => Model.PaymentMethod
+                            };
+                        }
+                        @pmLabel
                     </div>
                 </div>
             </div>

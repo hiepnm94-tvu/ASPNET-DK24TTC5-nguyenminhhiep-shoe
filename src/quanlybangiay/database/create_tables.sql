@@ -133,6 +133,7 @@ BEGIN
         DiscountAmount DECIMAL(18,2) NOT NULL DEFAULT 0,
         TotalAmount DECIMAL(18,2) NOT NULL DEFAULT 0,
         PaymentStatus TINYINT NULL,
+        PaymentMethod VARCHAR(50) NULL,
         OrderStatus TINYINT NULL,
         Note NVARCHAR(500) NULL,
         CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
@@ -185,6 +186,10 @@ BEGIN
             ALTER TABLE dbo.Orders ADD CONSTRAINT FK_Orders_Addresses FOREIGN KEY (AddressId) REFERENCES dbo.Addresses(AddressId);
         END
     END
+
+    -- Add PaymentMethod column if not present
+    IF COL_LENGTH('dbo.Orders', 'PaymentMethod') IS NULL
+        ALTER TABLE dbo.Orders ADD PaymentMethod VARCHAR(50) NULL;
 
     -- Add guest info columns if not present
     IF COL_LENGTH('dbo.Orders', 'GuestName') IS NULL

@@ -3,19 +3,37 @@
 @{
     Layout = "~/Views/Shared/_ManageLayout.cshtml";
     ViewData["Title"] = "Cập nhật đơn hàng";
+
+    // Helper: render selected="selected" when matched, omit otherwise
+    string Sel(string? modelVal, string optVal) =>
+        (modelVal ?? "") == optVal ? "selected" : "";
 }
 
 <div class="card mb-4">
     <h2 class="card-header fw-bold py-3 mb-4">Cập nhật đơn hàng #@Model.OrderCode</h2>
 
     <div class="card-body">
-        <div class="mb-4">
-            <label class="form-label fw-bold">Khách hàng</label>
-            <div>@(Model.User?.FullName ?? "—") (@(Model.User?.Email ?? "—"))</div>
-        </div>
-        <div class="mb-4">
-            <label class="form-label fw-bold">Tổng tiền</label>
-            <div class="fs-5 fw-bold text-primary">@Model.TotalAmount.ToString("N0") ₫</div>
+        <!-- Read-only summary -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Khách hàng</label>
+                @if (Model.User != null)
+                {
+                    <div>@(Model.User.FullName ?? Model.User.Email) <small class="text-muted">(@Model.User.Email)</small></div>
+                }
+                else
+                {
+                    <div>@(Model.GuestName ?? "Khách vãng lai")</div>
+                    @if (!string.IsNullOrWhiteSpace(Model.GuestPhone))
+                    {
+                        <div class="text-muted small">@Model.GuestPhone</div>
+                    }
+                }
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Tổng tiền</label>
+                <div class="fs-5 fw-bold text-primary">@Model.TotalAmount.ToString("N0") ₫</div>
+            </div>
         </div>
 
         <form asp-area="Admin" asp-controller="Orders" asp-action="Edit" method="post">
@@ -37,6 +55,12 @@
                     ("1", "Đã thanh toán"),
                     ("2", "Hoàn tiền")
                 };
+                var paymentMethodItems = new List<(string Value, string Text)>
+                {
+                    ("", "-- Chưa xác định --"),
+                    ("COD", "Thanh toán khi nhận hàng (COD)"),
+                    ("BankTransfer", "Chuyển khoản ngân hàng")
+                };
             }
             <div class="row">
                 <div class="col-md-6 mb-3">
@@ -57,6 +81,15 @@
                         }
                     </select>
                 </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Phương thức thanh toán</label>
+                    <select name="PaymentMethod" class="form-select">
+                        @foreach (var item in paymentMethodItems)
+                        {
+                            <option value="@item.Value" selected="@(Model.PaymentMethod.ToString() == item.Value)">@item.Text</option>
+                        }
+                    </select>
+                </div>
             </div>
 
             <div class="mb-3">
@@ -65,7 +98,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary btn-ad-save">Lưu</button>
-            <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="btn btn-outline-secondary btn-ad-cancel">Hủy</a>
+            <a asp-area="Admin" asp-controller="Orders" asp-action="Details" asp-route-id="@Model.OrderId" class="btn btn-outline-secondary btn-ad-cancel">Hủy</a>
         </form>
     </div>
 </div>
