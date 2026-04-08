@@ -35,7 +35,7 @@
         <div class="row row-pb-md">
             <div class="col footer-col colorlib-widget">
                 <h4>@shopName</h4>
-                <p>@(setting?.FooterContent ?? "Chuyên cung cấp các sản phẩm giày dép chất lượng cao.")</p>
+                <p>@Html.Raw(setting?.FooterContent ?? "Chuyên cung cấp các sản phẩm giày dép chất lượng cao.")</p>
                 <p>
                 <ul class="colorlib-social-icons">
                     @if (!string.IsNullOrWhiteSpace(setting?.FacebookUrl))
@@ -75,7 +75,7 @@
                     <li><a href="#">Giới thiệu</a></li>
                     <li><a href="#">Chính sách giao hàng</a></li>
                     <li><a href="#">Chính sách bảo mật</a></li>
-                    <li><a href="#">Theo dõi đơn hàng</a></li>
+                    <li><a asp-controller="Cart" asp-action="TrackOrder">Theo dõi đơn hàng</a></li>
                 </ul>
                 </p>
             </div>

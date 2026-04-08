@@ -37,14 +37,79 @@
         2 => "bg-label-danger",
         _ => "bg-label-dark"
     };
+
+    var searchOrderCode = ViewBag.OrderCode as string;
+    var searchCustomerName = ViewBag.CustomerName as string;
+    byte? searchOrderStatus = ViewBag.OrderStatus as byte?;
+    DateTime? searchDateFrom = ViewBag.DateFrom as DateTime?;
+    DateTime? searchDateTo = ViewBag.DateTo as DateTime?;
 }
 
 <div class="card">
-    <div class="d-flex justify-content-between align-items-center card-header mb-3">
+    <div class="d-flex justify-content-between align-items-center card-header mb-0">
         <h2>Quản lý đơn hàng</h2>
+        <div class="dropdown">
+            <button class="btn btn-outline-success dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bx bx-export me-1"></i> Xuất dữ liệu
+            </button>
+            <ul class="dropdown-menu">
+                <li><h6 class="dropdown-header">CSV</h6></li>
+                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Orders" asp-action="Export" asp-route-period="day" asp-route-format="csv">Hôm nay (1 ngày)</a></li>
+                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Orders" asp-action="Export" asp-route-period="week" asp-route-format="csv">1 Tuần</a></li>
+                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Orders" asp-action="Export" asp-route-period="month" asp-route-format="csv">1 Tháng</a></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li><h6 class="dropdown-header">JSON</h6></li>
+                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Orders" asp-action="Export" asp-route-period="day" asp-route-format="json">Hôm nay (1 ngày)</a></li>
+                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Orders" asp-action="Export" asp-route-period="week" asp-route-format="json">1 Tuần</a></li>
+                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Orders" asp-action="Export" asp-route-period="month" asp-route-format="json">1 Tháng</a></li>
+            </ul>
+        </div>
     </div>
 
-    <div class="table-responsive text-nowrap">
+    <div class="card-body pb-0">
+        <form method="get" asp-area="Admin" asp-controller="Orders" asp-action="Index">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-2">
+                    <label class="form-label">Mã đơn hàng</label>
+                    <input type="text" name="orderCode" class="form-control form-control-sm" value="@searchOrderCode" placeholder="VD: ORD2025..." />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Khách hàng</label>
+                    <input type="text" name="customerName" class="form-control form-control-sm" value="@searchCustomerName" placeholder="Tên khách hàng" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Trạng thái đơn</label>
+                    <select name="orderStatus" class="form-select form-select-sm">
+                        <option value="">-- Tất cả --</option>
+                        <option value="0" selected="@(searchOrderStatus == 0)">Chờ xác nhận</option>
+                        <option value="1" selected="@(searchOrderStatus == 1)">Đã xác nhận</option>
+                        <option value="2" selected="@(searchOrderStatus == 2)">Đang giao</option>
+                        <option value="3" selected="@(searchOrderStatus == 3)">Đã giao</option>
+                        <option value="4" selected="@(searchOrderStatus == 4)">Đã hủy</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Từ ngày</label>
+                    <input type="date" name="dateFrom" class="form-control form-control-sm" value="@(searchDateFrom?.ToString("yyyy-MM-dd"))" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Đến ngày</label>
+                    <input type="date" name="dateTo" class="form-control form-control-sm" value="@(searchDateTo?.ToString("yyyy-MM-dd"))" />
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bx bx-search me-1"></i> Tìm kiếm</button>
+                </div>
+            </div>
+            @if (!string.IsNullOrEmpty(searchOrderCode) || !string.IsNullOrEmpty(searchCustomerName) || searchOrderStatus.HasValue || searchDateFrom.HasValue || searchDateTo.HasValue)
+            {
+                <div class="mt-2">
+                    <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="btn btn-sm btn-outline-secondary"><i class="bx bx-x me-1"></i> Xóa bộ lọc</a>
+                </div>
+            }
+        </form>
+    </div>
+
+    <div class="table-responsive text-nowrap mt-3">
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>

@@ -21,17 +21,45 @@ namespace quanlybangiay.Controllers.Admin
             _env = env;
         }
 
-        public async Task<IActionResult> Index(int page = 1, int pageSize = 20)
+        public async Task<IActionResult> Index(
+            int? productId, string? sku, string? productName, byte? status,
+            int page = 1, int pageSize = 20)
         {
             var query = _db.Products
                 .Include(p => p.Category)
-                .OrderByDescending(p => p.CreatedAt)
                 .AsQueryable();
+
+            if (productId.HasValue)
+                query = query.Where(p => p.ProductId == productId.Value);
+
+            if (!string.IsNullOrWhiteSpace(sku))
+            {
+                var skuTrimmed = sku.Trim();
+                var matchingProductIds = _db.ProductVariants
+                    .Where(v => v.SKU.Contains(skuTrimmed))
+                    .Select(v => v.ProductId);
+                query = query.Where(p => matchingProductIds.Contains(p.ProductId));
+            }
+
+            if (!string.IsNullOrWhiteSpace(productName))
+                query = query.Where(p => p.ProductName.Contains(productName.Trim()));
+
+            if (status.HasValue)
+                query = query.Where(p => p.Status == status.Value);
+
+            query = query.OrderByDescending(p => p.CreatedAt);
+
             var items = await PaginatedList<Product>.CreateAsync(query, page, pageSize);
             ViewBag.Page = items.PageIndex;
             ViewBag.PageSize = items.PageSize;
             ViewBag.TotalCount = items.TotalCount;
             ViewBag.TotalPages = items.TotalPages;
+
+            ViewBag.SearchProductId = productId;
+            ViewBag.SearchSku = sku;
+            ViewBag.SearchProductName = productName;
+            ViewBag.SearchStatus = status;
+
             return View(items);
         }
 

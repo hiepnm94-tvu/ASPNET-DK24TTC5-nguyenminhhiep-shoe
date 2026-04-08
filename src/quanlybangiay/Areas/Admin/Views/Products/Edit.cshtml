@@ -57,7 +57,7 @@
 
             <div class="mb-3">
                 <label class="form-label">Mô tả chi tiết</label>
-                <textarea asp-for="Description" class="form-control" rows="6" placeholder="Vui lòng nhập mô tả chi tiết"></textarea>
+                <textarea asp-for="Description" class="form-control tinymce-editor" rows="6" placeholder="Vui lòng nhập mô tả chi tiết"></textarea>
             </div>
 
             <div class="mb-3">
@@ -91,3 +91,7 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    @await Html.PartialAsync("~/Areas/Admin/Views/Shared/_TinyMCE.cshtml")
+}

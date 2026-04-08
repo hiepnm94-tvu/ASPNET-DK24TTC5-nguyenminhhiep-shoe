@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using quanlybangiay.Data;
 using quanlybangiay.Helpers;
+using quanlybangiay.Models;
 using quanlybangiay.Models.ViewModels;
 
 namespace quanlybangiay.Controllers
@@ -110,6 +111,43 @@ namespace quanlybangiay.Controllers
         {
             var cart = GetCart();
             return Json(new { count = cart.Sum(c => c.Quantity) });
+        }
+
+        [HttpGet]
+        public IActionResult TrackOrder()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> TrackOrder(string orderCode)
+        {
+            if (string.IsNullOrWhiteSpace(orderCode))
+            {
+                ViewBag.Error = "Vui lòng nhập mã đơn hàng.";
+                return View();
+            }
+
+            var order = await _db.Orders
+                .Include(o => o.User)
+                .FirstOrDefaultAsync(o => o.OrderCode == orderCode.Trim());
+
+            if (order == null)
+            {
+                ViewBag.Error = "Không tìm thấy đơn hàng với mã này. Vui lòng kiểm tra lại.";
+                ViewBag.SearchCode = orderCode;
+                return View();
+            }
+
+            var orderItems = await _db.OrderItems
+                .Where(oi => oi.OrderId == order.OrderId)
+                .ToListAsync();
+
+            ViewBag.Order = order;
+            ViewBag.OrderItems = orderItems;
+            ViewBag.SearchCode = orderCode;
+
+            return View();
         }
     }
 }
