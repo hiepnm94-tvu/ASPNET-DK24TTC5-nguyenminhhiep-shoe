@@ -1,0 +1,69 @@
+@model int
+@{
+    var code = Model > 0 ? Model : 500;
+    ViewData["Title"] = $"{code} - Đã xảy ra lỗi";
+
+    string heading = code switch {
+        400 => "Yêu cầu không hợp lệ (400)",
+        401 => "Chưa xác thực (401)",
+        403 => "Không có quyền truy cập (403)",
+        408 => "Yêu cầu hết thời gian (408)",
+        500 => "Lỗi máy chủ (500)",
+        502 => "Bad Gateway (502)",
+        503 => "Đang bảo trì (503)",
+        _   => $"Đã xảy ra lỗi ({code})"
+    };
+    string detail = code switch {
+        400 => "Máy chủ không thể xử lý yêu cầu do dữ liệu không hợp lệ.",
+        401 => "Bạn cần đăng nhập để truy cập trang này.",
+        403 => "Bạn không có quyền thực hiện hành động này.",
+        408 => "Kết nối đến máy chủ mất quá nhiều thời gian. Vui lòng thử lại.",
+        500 => "Máy chủ gặp sự cố không mong muốn. Vui lòng thử lại sau.",
+        502 => "Máy chủ đầu cuối phản hồi không hợp lệ.",
+        503 => "Chúng tôi đang thực hiện bảo trì. Vui lòng quay lại sau ít phút.",
+        _   => "Đã xảy ra lỗi không xác định. Vui lòng thử lại hoặc liên hệ hỗ trợ."
+    };
+}
+
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <p class="bread">
+                    <span><a asp-controller="Home" asp-action="Index">Trang chủ</a></span>
+                    <span>Lỗi @code</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="ftco-section" style="padding: 6rem 0;">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-md-8">
+                <div style="font-size:9rem; font-weight:700; line-height:1; color:#e8e8e8; letter-spacing:-4px;">@code</div>
+                <h2 style="margin-top:-1rem; margin-bottom:1rem;">@heading</h2>
+                <p class="text-muted mb-4">@detail</p>
+
+                @if (ViewBag.Exception != null)
+                {
+                    <div class="alert alert-warning text-start mx-auto" style="max-width:520px;">
+                        <strong>Chi tiết lỗi:</strong> @ViewBag.Exception
+                        @if (ViewBag.Path != null)
+                        {
+                            <br /><strong>Đường dẫn:</strong> @ViewBag.Path
+                        }
+                    </div>
+                }
+
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary px-4 me-2">
+                    <i class="ion-ios-home"></i> Về trang chủ
+                </a>
+                <button onclick="history.back()" class="btn btn-outline-secondary px-4">
+                    <i class="ion-ios-arrow-back"></i> Quay lại
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
