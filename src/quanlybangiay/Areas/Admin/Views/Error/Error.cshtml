@@ -1,0 +1,95 @@
+@model int
+@{
+    Layout = null;
+    var code = Model > 0 ? Model : 500;
+    ViewData["Title"] = $"{code} - Đã xảy ra lỗi";
+
+    string heading = code switch {
+        400 => "Yêu cầu không hợp lệ",
+        401 => "Chưa xác thực",
+        403 => "Không có quyền truy cập",
+        408 => "Yêu cầu hết thời gian chờ",
+        500 => "Lỗi máy chủ nội bộ",
+        502 => "Bad Gateway",
+        _   => $"Đã xảy ra lỗi ({code})"
+    };
+    string detail = code switch {
+        400 => "Máy chủ không thể xử lý yêu cầu do dữ liệu không hợp lệ.",
+        401 => "Bạn cần đăng nhập để truy cập trang này.",
+        403 => "Bạn không có quyền thực hiện hành động này.",
+        408 => "Kết nối đến máy chủ mất quá nhiều thời gian.",
+        500 => "Máy chủ gặp sự cố không mong muốn. Vui lòng thử lại sau.",
+        502 => "Máy chủ đầu cuối phản hồi không hợp lệ.",
+        _   => "Đã xảy ra lỗi không xác định. Vui lòng thử lại hoặc liên hệ quản trị viên."
+    };
+}
+<!DOCTYPE html>
+<html lang="vi" class="light-style" dir="ltr"
+      data-theme="theme-default"
+      data-assets-path="~/admin/assets/"
+      data-template="vertical-menu-template-free">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>@code – @heading | Admin</title>
+    <meta name="description" content="" />
+
+    <link rel="icon" type="image/x-icon" href="~/admin/assets/img/favicon/favicon.ico" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="~/admin/assets/vendor/fonts/boxicons.css" />
+    <link rel="stylesheet" href="~/admin/assets/vendor/css/core.css" />
+    <link rel="stylesheet" href="~/admin/assets/vendor/css/theme-default.css" />
+    <link rel="stylesheet" href="~/admin/assets/css/demo.css" />
+    <link rel="stylesheet" href="~/admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="~/admin/assets/vendor/css/pages/page-misc.css" />
+
+    <script src="~/admin/assets/vendor/js/helpers.js"></script>
+    <script src="~/admin/assets/js/config.js"></script>
+</head>
+<body>
+    <div class="container-xxl container-p-y">
+        <div class="misc-wrapper">
+            <h2 class="mb-2 mx-2">@heading</h2>
+            <p class="mb-1 mx-2">@detail</p>
+            <p class="mb-4 mx-2 text-muted">Mã lỗi: <strong>@code</strong></p>
+            <a asp-area="Admin" asp-controller="Manage" asp-action="Index" class="btn btn-primary me-2">
+                <i class="bx bx-home me-1"></i> Về trang tổng quan
+            </a>
+            <button onclick="history.back()" class="btn btn-outline-secondary">
+                <i class="bx bx-arrow-back me-1"></i> Quay lại
+            </button>
+
+            @if (ViewBag.Exception != null)
+            {
+                <div class="alert alert-danger mt-4 text-start" role="alert">
+                    <strong>Chi tiết lỗi:</strong> @ViewBag.Exception
+                    @if (ViewBag.Path != null)
+                    {
+                        <br /><strong>Đường dẫn:</strong> @ViewBag.Path
+                    }
+                </div>
+            }
+
+            <div class="mt-4">
+                <img src="~/admin/assets/img/illustrations/page-misc-error-light.png"
+                     alt="Error"
+                     width="500"
+                     class="img-fluid"
+                     data-app-dark-img="illustrations/page-misc-error-dark.png"
+                     data-app-light-img="illustrations/page-misc-error-light.png" />
+            </div>
+        </div>
+    </div>
+
+    <script src="~/admin/assets/vendor/libs/jquery/jquery.js"></script>
+    <script src="~/admin/assets/vendor/libs/popper/popper.js"></script>
+    <script src="~/admin/assets/vendor/js/bootstrap.js"></script>
+    <script src="~/admin/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="~/admin/assets/vendor/js/menu.js"></script>
+    <script src="~/admin/assets/js/main.js"></script>
+</body>
+</html>
