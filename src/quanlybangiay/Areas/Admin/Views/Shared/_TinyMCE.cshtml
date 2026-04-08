@@ -1,0 +1,32 @@
+@*
+    TinyMCE 7 (free / self-hosted via cdnjs CDN, no API key required).
+    Add class "tinymce-editor" to any <textarea> that should become a rich editor.
+    Include this partial inside @section Scripts { } of the page.
+*@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/7.6.0/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+    tinymce.init({
+        selector: 'textarea.tinymce-editor',
+        height: 400,
+        menubar: true,
+        language: 'vi',
+        plugins: [
+            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+            'insertdatetime', 'media', 'table', 'help', 'wordcount'
+        ],
+        toolbar: 'undo redo | blocks | bold italic underline strikethrough | ' +
+        'alignleft aligncenter alignright alignjustify | ' +
+        'bullist numlist outdent indent | link image media table | ' +
+        'forecolor backcolor removeformat | code fullscreen help',
+        content_style: 'body { font-family: "Montserrat", Arial, sans-serif; font-size: 14px; }',
+        branding: false,
+        promotion: false,
+        license_key: 'gpl',
+        setup: function (editor) {
+        editor.on('change', function () {
+                editor.save();
+            });
+        }
+    });
+</script>

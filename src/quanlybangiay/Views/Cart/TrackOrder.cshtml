@@ -1,0 +1,168 @@
+@{
+    ViewData["Title"] = "Theo dõi đơn hàng";
+    var order = ViewBag.Order as quanlybangiay.Models.Order;
+    var orderItems = ViewBag.OrderItems as List<quanlybangiay.Models.OrderItem> ?? new List<quanlybangiay.Models.OrderItem>();
+    var error = ViewBag.Error as string;
+    var searchCode = ViewBag.SearchCode as string;
+
+    string OrderStatusLabel(byte? status) => status switch
+    {
+        0 => "Chờ xác nhận",
+        1 => "Đã xác nhận",
+        2 => "Đang giao",
+        3 => "Đã giao",
+        4 => "Đã hủy",
+        _ => "Không rõ"
+    };
+    string OrderStatusColor(byte? status) => status switch
+    {
+        0 => "#f0ad4e",
+        1 => "#5bc0de",
+        2 => "#0275d8",
+        3 => "#5cb85c",
+        4 => "#d9534f",
+        _ => "#636c72"
+    };
+    string PaymentStatusLabel(byte? status) => status switch
+    {
+        0 => "Chưa thanh toán",
+        1 => "Đã thanh toán",
+        2 => "Hoàn tiền",
+        _ => "Không rõ"
+    };
+}
+
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <p class="bread">
+                    <span><a asp-controller="Home" asp-action="Index">Trang chủ</a></span>
+                    <span>Theo dõi đơn hàng</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="colorlib-product">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="text-center mb-4">
+                    <h2>Theo dõi đơn hàng</h2>
+                    <p class="text-muted">Nhập mã đơn hàng để kiểm tra trạng thái đơn hàng của bạn</p>
+                </div>
+
+                <form method="post" asp-controller="Cart" asp-action="TrackOrder" class="mb-4">
+                    <div class="input-group" style="max-width: 500px; margin: 0 auto;">
+                        <input type="text" name="orderCode" class="form-control" value="@searchCode"
+                               placeholder="Nhập mã đơn hàng (VD: ORD2025...)" required />
+                        <button type="submit" class="btn btn-primary">
+                            <i class="icon-search"></i> Tra cứu
+                        </button>
+                    </div>
+                </form>
+
+                @if (!string.IsNullOrEmpty(error))
+                {
+                    <div class="alert alert-warning text-center">@error</div>
+                }
+
+                @if (order != null)
+                {
+                    <div class="card border mb-4" style="border-radius: 8px;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start flex-wrap mb-3">
+                                <div>
+                                    <h4 class="mb-1">Đơn hàng: <strong>@order.OrderCode</strong></h4>
+                                    <p class="text-muted mb-0">Ngày đặt: @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge" style="background-color: @OrderStatusColor(order.OrderStatus); color: #fff; font-size: 0.9rem; padding: 6px 12px;">
+                                        @OrderStatusLabel(order.OrderStatus)
+                                    </span>
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                                    <strong>Khách hàng:</strong>
+                                    <p class="mb-0">@(order.User?.FullName ?? order.GuestName ?? "Khách")</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Phương thức thanh toán:</strong>
+                                    <p class="mb-0">@(order.PaymentMethod ?? "—")</p>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                                    <strong>Thanh toán:</strong>
+                                    <p class="mb-0">@PaymentStatusLabel(order.PaymentStatus)</p>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Địa chỉ giao hàng:</strong>
+                                    <p class="mb-0">@(order.GuestAddress ?? "—")</p>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(order.Note))
+                            {
+                                <div class="mb-3">
+                                    <strong>Ghi chú:</strong>
+                                    <p class="mb-0">@order.Note</p>
+                                </div>
+                            }
+
+                            @if (orderItems.Any())
+                            {
+                                <hr />
+                                <h5 class="mb-3">Chi tiết sản phẩm</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Sản phẩm</th>
+                                                <th class="text-center">Size</th>
+                                                <th class="text-center">Màu</th>
+                                                <th class="text-center">Số lượng</th>
+                                                <th class="text-end">Đơn giá</th>
+                                                <th class="text-end">Thành tiền</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in orderItems)
+                                            {
+                                                <tr>
+                                                    <td>@item.ProductName</td>
+                                                    <td class="text-center">@(item.SizeValue ?? "—")</td>
+                                                    <td class="text-center">@(item.ColorName ?? "—")</td>
+                                                    <td class="text-center">@item.Quantity</td>
+                                                    <td class="text-end">@item.UnitPrice.ToString("N0") đ</td>
+                                                    <td class="text-end">@item.LineTotal.ToString("N0") đ</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <hr />
+                                <div class="text-end">
+                                    <p class="mb-1">Tạm tính: <strong>@order.Subtotal.ToString("N0") đ</strong></p>
+                                    <p class="mb-1">Phí vận chuyển: <strong>@order.ShippingFee.ToString("N0") đ</strong></p>
+                                    @if (order.DiscountAmount > 0)
+                                    {
+                                        <p class="mb-1">Giảm giá: <strong>-@order.DiscountAmount.ToString("N0") đ</strong></p>
+                                    }
+                                    <p style="font-size: 1.2rem;"><strong>Tổng cộng: @order.TotalAmount.ToString("N0") đ</strong></p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

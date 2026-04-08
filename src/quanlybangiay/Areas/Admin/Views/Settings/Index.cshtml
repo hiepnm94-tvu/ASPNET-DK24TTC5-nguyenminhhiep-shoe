@@ -131,7 +131,7 @@
                 <div class="card-body">
                     <div class="mb-3">
                         <label class="form-label">Nội dung Footer</label>
-                        <textarea asp-for="FooterContent" class="form-control" rows="4" placeholder="Nội dung hiển thị ở chân trang..."></textarea>
+                        <textarea asp-for="FooterContent" class="form-control tinymce-editor" rows="4" placeholder="Nội dung hiển thị ở chân trang..."></textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Bản quyền</label>
@@ -184,3 +184,6 @@
         </button>
     </div>
 </form>
+@section Scripts {
+    @await Html.PartialAsync("~/Areas/Admin/Views/Shared/_TinyMCE.cshtml")
+}
