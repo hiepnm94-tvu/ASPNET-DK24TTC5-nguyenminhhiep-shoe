@@ -50,15 +50,82 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
-// Add admin/manage route so requests to /admin map to ManageController
-// Map routes including areas
+// Admin area route
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Manage}/{action=Index}/{id?}");
 
+// --- SEO-friendly storefront routes ---
+
+// PDP – Product Detail Page by slug
+app.MapControllerRoute(
+    name: "product-detail",
+    pattern: "san-pham/{slug}",
+    defaults: new { controller = "Product", action = "Detail" });
+
+// PLP – Product Listing / Category by slug
+app.MapControllerRoute(
+    name: "category-by-slug",
+    pattern: "danh-muc/{slug}",
+    defaults: new { controller = "Product", action = "Category" });
+
+// PLP – All products
+app.MapControllerRoute(
+    name: "product-list",
+    pattern: "san-pham",
+    defaults: new { controller = "Product", action = "Category" });
+
+// Search
+app.MapControllerRoute(
+    name: "search",
+    pattern: "tim-kiem",
+    defaults: new { controller = "Product", action = "Search" });
+
+// Post detail by slug
+app.MapControllerRoute(
+    name: "post-detail",
+    pattern: "bai-viet/{slug}",
+    defaults: new { controller = "Post", action = "Detail" });
+
+// Post listing
+app.MapControllerRoute(
+    name: "post-list",
+    pattern: "bai-viet",
+    defaults: new { controller = "Post", action = "Index" });
+
+// Contact
+app.MapControllerRoute(
+    name: "contact",
+    pattern: "lien-he",
+    defaults: new { controller = "Contact", action = "Index" });
+
+// Cart
+app.MapControllerRoute(
+    name: "cart",
+    pattern: "gio-hang",
+    defaults: new { controller = "Cart", action = "Index" });
+
+// Track Order
+app.MapControllerRoute(
+    name: "track-order",
+    pattern: "tra-cuu-don-hang",
+    defaults: new { controller = "Cart", action = "TrackOrder" });
+
+// Checkout
+app.MapControllerRoute(
+    name: "checkout",
+    pattern: "thanh-toan",
+    defaults: new { controller = "Checkout", action = "Index" });
+
+// Checkout complete
+app.MapControllerRoute(
+    name: "checkout-complete",
+    pattern: "thanh-toan/hoan-tat/{id}",
+    defaults: new { controller = "Checkout", action = "Complete" });
+
+// Default fallback route
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
 
 app.Run();

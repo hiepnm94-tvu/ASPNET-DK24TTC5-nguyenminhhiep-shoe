@@ -10,7 +10,7 @@
         <div class="row">
             <div class="col">
                 <p class="bread">
-                    <span><a asp-controller="Home" asp-action="Index">Trang chủ</a></span>
+                    <span><a href="/">Trang chủ</a></span> /
                     <span>Liên hệ</span>
                 </p>
             </div>
@@ -56,7 +56,7 @@
                     <div class="col-md-3">
                         <p>
                             <span><i class="icon-globe"></i></span>
-                            <a asp-controller="Home" asp-action="Index">@(setting?.ShopName ?? "Shop Giày")</a>
+                            <a href="/">@(setting?.ShopName ?? "Shop Giày")</a>
                         </p>
                     </div>
                 </div>
@@ -76,7 +76,7 @@
                     }
 
                     <h3>Liên hệ với chúng tôi</h3>
-                    <form asp-controller="Contact" asp-action="Submit" method="post" asp-antiforgery="false" class="contact-form">
+                    <form action="/Contact/Submit" method="post" asp-antiforgery="false" class="contact-form">
                         @Html.AntiForgeryToken()
                         <div class="row">
                             

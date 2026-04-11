@@ -30,7 +30,7 @@
                     <div id="colorlib-logo"><a asp-controller="Home" asp-action="Index">@shopName</a></div>
                 </div>
                 <div class="col-sm-5 col-md-3">
-                    <form asp-controller="Product" asp-action="Search" method="get" class="search-wrap">
+                    <form action="/tim-kiem" method="get" class="search-wrap">
                         <div class="form-group">
                             <input type="search" name="q" class="form-control search" placeholder="Tìm kiếm sản phẩm...">
                             <button class="btn btn-primary submit-search text-center" type="submit"><i class="icon-search"></i></button>
@@ -41,40 +41,21 @@
             <div class="row">
                 <div class="col-sm-12 text-left menu-1">
                     <ul>
-                        <li><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                        <li><a href="/">Trang chủ</a></li>
                         @foreach (var cat in categories)
                         {
-                            <li><a asp-controller="Product" asp-action="Category" asp-route-id="@cat.CategoryId">@cat.CategoryName</a></li>
+                            var catUrl = !string.IsNullOrWhiteSpace(cat.Slug)
+                                ? $"/danh-muc/{cat.Slug}"
+                                : Url.Action("Category", "Product", new { id = cat.CategoryId });
+                            <li><a href="@catUrl">@cat.CategoryName</a></li>
                         }
-                        <li><a asp-controller="Contact" asp-action="Index">Liên hệ</a></li>
+                        <li><a href="/lien-he">Liên hệ</a></li>
                         <li class="cart">
-                            <a asp-controller="Cart" asp-action="Index">
+                            <a href="/gio-hang">
                                 <i class="icon-shopping-cart"></i> Giỏ hàng [<span id="cart-count">@cartCount</span>]
                             </a>
                         </li>
                     </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="sale">
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-8 offset-sm-2 text-center">
-                    <div class="row">
-                        <div class="owl-carousel2">
-                            <div class="item">
-                                <div class="col">
-                                    <h3><a href="#">Giảm 25% hầu hết sản phẩm! Mã: SUMMER25</a></h3>
-                                </div>
-                            </div>
-                            <div class="item">
-                                <div class="col">
-                                    <h3><a href="#">Giảm 50% tất cả giày mùa hè</a></h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

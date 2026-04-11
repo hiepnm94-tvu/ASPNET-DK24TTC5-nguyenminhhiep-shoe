@@ -1,0 +1,63 @@
+@model quanlybangiay.Models.Slider
+@{
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
+    ViewData["Title"] = "Sửa Slider";
+}
+
+<div class="card mb-4">
+    <h2 class="card-header fw-bold py-3 mb-4">Sửa Slider</h2>
+    <div class="card-body">
+        <form asp-area="Admin" asp-controller="Sliders" asp-action="Edit" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="SliderId" />
+
+            <div class="mb-3">
+                <label class="form-label">Hình ảnh</label>
+                @if (!string.IsNullOrWhiteSpace(Model.Image))
+                {
+                    <div class="mb-2">
+                        <img src="@Model.Image" style="max-height:120px;max-width:100%;border-radius:6px;" class="border p-1" />
+                        <small class="text-muted d-block mt-1">Ảnh hiện tại — tải ảnh mới để thay thế</small>
+                    </div>
+                }
+                <input type="hidden" asp-for="Image" />
+                <input type="file" name="imageFile" class="form-control" accept="image/*"
+                       onchange="previewImg(this,'img-preview-edit')" />
+                <small class="text-muted">Định dạng: jpg, jpeg, png, gif, webp. Tối đa 5MB. Kích thước khuyến nghị: 1920x800px.</small>
+                @Html.ValidationMessage("imageFile", "", new { @class = "text-danger" })
+                <div id="img-preview-edit" class="mt-2"></div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Tiêu đề</label>
+                <input asp-for="Title" class="form-control" placeholder="VD: Men's Shoes Collection" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Phụ đề</label>
+                <input asp-for="Subtitle" class="form-control" placeholder="VD: Xu hướng giày mới" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Liên kết (URL)</label>
+                <input asp-for="LinkUrl" class="form-control" placeholder="VD: /san-pham" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Thứ tự sắp xếp</label>
+                <input asp-for="SortOrder" type="number" class="form-control" style="max-width:150px;" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Trạng thái</label>
+                <select name="IsActive" class="form-select" style="max-width:250px;">
+                    <option value="true" selected="@(Model.IsActive)">Hiển thị</option>
+                    <option value="false" selected="@(!Model.IsActive)">Ẩn</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-ad-save">Lưu</button>
+            <a asp-area="Admin" asp-controller="Sliders" asp-action="Index" class="btn btn-outline-secondary btn-ad-cancel">Hủy</a>
+        </form>
+    </div>
+</div>

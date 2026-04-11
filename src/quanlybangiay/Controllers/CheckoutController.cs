@@ -27,7 +27,7 @@ namespace quanlybangiay.Controllers
         {
             var cart = GetCart();
             if (!cart.Any())
-                return RedirectToAction("Index", "Cart");
+                return Redirect("/gio-hang");
 
             ViewBag.Cart = cart;
             ViewBag.Subtotal = cart.Sum(c => c.LineTotal);
@@ -40,7 +40,7 @@ namespace quanlybangiay.Controllers
         {
             var cart = GetCart();
             if (!cart.Any())
-                return RedirectToAction("Index", "Cart");
+                return Redirect("/gio-hang");
 
             if (!ModelState.IsValid)
             {
@@ -97,7 +97,7 @@ namespace quanlybangiay.Controllers
 
             HttpContext.Session.Remove(CartSessionKey);
 
-            return RedirectToAction("Complete", new { id = order.OrderId });
+            return RedirectToRoute("checkout-complete", new { id = order.OrderId });
         }
 
         public async Task<IActionResult> Complete(long id)

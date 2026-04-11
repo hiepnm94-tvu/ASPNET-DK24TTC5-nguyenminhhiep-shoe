@@ -3,7 +3,6 @@
     Layout = "~/Views/Shared/_ManageLayout.cshtml";
     ViewData["Title"] = "Chi tiết đơn hàng";
     var orderItems = ViewBag.OrderItems as List<quanlybangiay.Models.OrderItem> ?? new List<quanlybangiay.Models.OrderItem>();
-    var payments = ViewBag.Payments as List<quanlybangiay.Models.Payment> ?? new List<quanlybangiay.Models.Payment>();
 
     string OrderStatusLabel(byte? status) => status switch
     {
@@ -162,46 +161,6 @@
                             <td>@oi.UnitPrice.ToString("N0") ₫</td>
                             <td>@oi.Quantity</td>
                             <td>@oi.LineTotal.ToString("N0") ₫</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-}
-
-@if (payments.Any())
-{
-    <div class="card mb-4">
-        <h5 class="card-header fw-bold py-3">Lịch sử thanh toán</h5>
-        <div class="table-responsive text-nowrap">
-            <table class="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Phương thức</th>
-                        <th>Mã giao dịch</th>
-                        <th>Số tiền</th>
-                        <th>Ngày thanh toán</th>
-                        <th>Trạng thái</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var p in payments)
-                    {
-                        <tr>
-                            <td>@p.PaymentId</td>
-                            <td>@(p.Method ?? "—")</td>
-                            <td>@(p.GatewayTransactionId ?? "—")</td>
-                            <td>@p.Amount.ToString("N0") ₫</td>
-                            <td>@(p.PaidAt?.ToString("dd/MM/yyyy HH:mm") ?? "—")</td>
-                            <td>
-                                @{
-                                    var pStatusText = p.Status switch { 0 => "Chờ", 1 => "Thành công", 2 => "Thất bại", _ => "Không rõ" };
-                                    var pStatusClass = p.Status switch { 1 => "bg-label-success", 2 => "bg-label-danger", _ => "bg-label-warning" };
-                                }
-                                <span class="badge @pStatusClass">@pStatusText</span>
-                            </td>
                         </tr>
                     }
                 </tbody>

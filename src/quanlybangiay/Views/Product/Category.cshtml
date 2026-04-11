@@ -3,44 +3,65 @@
     var categories = ViewBag.Categories as IList<Category> ?? new List<Category>();
     var currentCategory = ViewBag.CurrentCategory as Category;
     var categoryId = ViewBag.CategoryId as int?;
+    var categorySlug = ViewBag.CategorySlug as string;
     var page = ViewBag.Page is int pg ? pg : 1;
     var totalPages = ViewBag.TotalPages is int tp ? tp : 0;
     var bannerTitle = currentCategory?.CategoryName ?? "Sản phẩm";
+    var backgroundImage = "/images/men.jpg";
+    if (currentCategory?.CategoryId == 1) // Nam
+    {
+        backgroundImage = "/images/men.jpg";
+    }
+    else if (currentCategory?.CategoryId == 2) // Nữ
+    {
+        backgroundImage = "/images/cover-img-1.jpg";
+    }
+    else if (currentCategory?.CategoryId == 3) // Trẻ em
+    {
+        backgroundImage = "/images/shoe-sports.jpg";
+    }
     ViewData["Title"] = bannerTitle;
 }
 
-<div class="breadcrumbs">
-    <div class="container">
-        <div class="row">
-            <div class="col">
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="breadcrumbs">
                 <p class="bread">
-                    <span><a asp-controller="Home" asp-action="Index">Trang chủ</a></span>
-                    <span>@bannerTitle</span>
+                    <span><a href="/">Trang chủ</a></span> /
+                    <span><a href="/san-pham">Sản phẩm</a></span>
+                    @if (currentCategory != null)
+                    {
+                        <text> / </text>
+                        <span>@currentCategory.CategoryName</span>
+                    }
                 </p>
             </div>
         </div>
     </div>
 </div>
 
-<div class="breadcrumbs-img" style="background-image: url('/images/men.jpg');">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-12 text-center">
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="breadcrumbs-img" style="background-image: url('@backgroundImage');">
                 <div class="desc">
-                    <h2>@bannerTitle</h2>
+                    <h2 class="text-hide">@bannerTitle</h2>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+
 <div class="container">
     <div class="menu text-center">
         <p>
-            <a asp-controller="Product" asp-action="Category" class="@(!categoryId.HasValue ? "font-weight-bold" : "")">Tất cả</a>
+            <a href="/san-pham" class="@(!categoryId.HasValue ? "font-weight-bold" : "")">Tất cả</a>
             @foreach (var c in categories)
             {
-                <a asp-controller="Product" asp-action="Category" asp-route-id="@c.CategoryId" class="@(categoryId == c.CategoryId ? "font-weight-bold" : "")">@c.CategoryName</a>
+                var cUrl = !string.IsNullOrWhiteSpace(c.Slug) ? $"/danh-muc/{c.Slug}" : Url.Action("Category", "Product", new { id = c.CategoryId });
+                <a href="@cUrl" class="@(categoryId == c.CategoryId ? "font-weight-bold" : "")">@c.CategoryName</a>
             }
         </p>
     </div>
@@ -58,16 +79,21 @@
         }
         else
         {
-            <div class="row row-pb-md">
+            var basePageUrl = !string.IsNullOrWhiteSpace(categorySlug) ? $"/danh-muc/{categorySlug}" : "/san-pham";
+            
+            <div class="row">
                 @foreach (var p in Model)
                 {
+                    var prdUrl = !string.IsNullOrWhiteSpace(p.Slug)
+                        ? $"/san-pham/{p.Slug}"
+                        : Url.Action("Detail", "Product", new { id = p.ProductId });
                     <div class="col-md-3 col-lg-3 mb-4 text-center">
                         <div class="product-entry border">
-                            <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.ProductId" class="prod-img">
+                            <a href="@prdUrl" class="prod-img">
                                 <img src="@(p.ThumbnailUrl ?? "/images/no-image.png")" class="img-fluid" alt="@p.ProductName">
                             </a>
                             <div class="desc">
-                                <h2><a asp-controller="Product" asp-action="Detail" asp-route-id="@p.ProductId">@p.ProductName</a></h2>
+                                <h2><a href="@prdUrl">@p.ProductName</a></h2>
                                 @if (p.DiscountPrice.HasValue)
                                 {
                                     <span class="price">@p.DiscountPrice.Value.ToString("N0") đ</span>
@@ -91,9 +117,7 @@
                             <ul>
                                 @if (page > 1)
                                 {
-                                    <li>
-                                        <a asp-controller="Product" asp-action="Category" asp-route-id="@categoryId" asp-route-page="@(page - 1)"><i class="ion-ios-arrow-back"></i></a>
-                                    </li>
+                                    <li><a href="@basePageUrl?page=@(page - 1)"><i class="ion-ios-arrow-back"></i></a></li>
                                 }
                                 @for (var i = 1; i <= totalPages; i++)
                                 {
@@ -104,15 +128,13 @@
                                         }
                                         else
                                         {
-                                            <a asp-controller="Product" asp-action="Category" asp-route-id="@categoryId" asp-route-page="@i">@i</a>
+                                            <a href="@basePageUrl?page=@i">@i</a>
                                         }
                                     </li>
                                 }
                                 @if (page < totalPages)
                                 {
-                                    <li>
-                                        <a asp-controller="Product" asp-action="Category" asp-route-id="@categoryId" asp-route-page="@(page + 1)"><i class="ion-ios-arrow-forward"></i></a>
-                                    </li>
+                                    <li><a href="@basePageUrl?page=@(page + 1)"><i class="ion-ios-arrow-forward"></i></a></li>
                                 }
                             </ul>
                         </div>

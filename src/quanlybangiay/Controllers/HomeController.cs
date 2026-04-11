@@ -29,8 +29,15 @@ namespace quanlybangiay.Controllers
                 .Take(8)
                 .ToListAsync();
 
+            var sliders = await _db.Sliders
+                .Where(s => s.IsActive)
+                .OrderBy(s => s.SortOrder)
+                .ThenByDescending(s => s.CreatedAt)
+                .ToListAsync();
+
             ViewBag.Categories = categories;
             ViewBag.BestSellers = bestSellers;
+            ViewBag.Sliders = sliders;
 
             return View();
         }

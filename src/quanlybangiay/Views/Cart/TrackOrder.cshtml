@@ -37,7 +37,7 @@
         <div class="row">
             <div class="col">
                 <p class="bread">
-                    <span><a asp-controller="Home" asp-action="Index">Trang chủ</a></span>
+                    <span><a href="/">Trang chủ</a></span> /
                     <span>Theo dõi đơn hàng</span>
                 </p>
             </div>
@@ -54,7 +54,7 @@
                     <p class="text-muted">Nhập mã đơn hàng để kiểm tra trạng thái đơn hàng của bạn</p>
                 </div>
 
-                <form method="post" asp-controller="Cart" asp-action="TrackOrder" class="mb-4">
+                <form method="post" action="/tra-cuu-don-hang" class="mb-4">
                     <div class="input-group" style="max-width: 500px; margin: 0 auto;">
                         <input type="text" name="orderCode" class="form-control" value="@searchCode"
                                placeholder="Nhập mã đơn hàng (VD: ORD2025...)" required />

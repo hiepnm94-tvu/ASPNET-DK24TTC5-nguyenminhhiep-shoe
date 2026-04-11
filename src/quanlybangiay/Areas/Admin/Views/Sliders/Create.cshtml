@@ -1,0 +1,54 @@
+@model quanlybangiay.Models.Slider
+@{
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
+    ViewData["Title"] = "Tạo Slider";
+}
+
+<div class="card mb-4">
+    <h2 class="card-header fw-bold py-3 mb-4">Tạo Slider</h2>
+    <div class="card-body">
+        <form asp-area="Admin" asp-controller="Sliders" asp-action="Create" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label class="form-label">Hình ảnh <span class="text-danger">*</span></label>
+                <input type="file" name="imageFile" class="form-control" accept="image/*" required
+                       onchange="previewImg(this,'img-preview-create')" />
+                <small class="text-muted">Định dạng: jpg, jpeg, png, gif, webp. Tối đa 5MB. Kích thước khuyến nghị: 1920x800px.</small>
+                @Html.ValidationMessage("imageFile", "", new { @class = "text-danger" })
+                <div id="img-preview-create" class="mt-2"></div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Tiêu đề</label>
+                <input asp-for="Title" class="form-control" placeholder="VD: Men's Shoes Collection" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Phụ đề</label>
+                <input asp-for="Subtitle" class="form-control" placeholder="VD: Xu hướng giày mới" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Liên kết (URL)</label>
+                <input asp-for="LinkUrl" class="form-control" placeholder="VD: /san-pham" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Thứ tự sắp xếp</label>
+                <input asp-for="SortOrder" type="number" class="form-control" value="0" style="max-width:150px;" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Trạng thái</label>
+                <select name="IsActive" class="form-select" style="max-width:250px;">
+                    <option value="true" selected>Hiển thị</option>
+                    <option value="false">Ẩn</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-ad-save">Lưu</button>
+            <a asp-area="Admin" asp-controller="Sliders" asp-action="Index" class="btn btn-outline-secondary btn-ad-cancel">Hủy</a>
+        </form>
+    </div>
+</div>
