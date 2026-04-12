@@ -41,17 +41,6 @@ BEGIN
     );
 END
 
--- Promotions (minimal)
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Promotions]') AND type in (N'U'))
-BEGIN
-    CREATE TABLE dbo.Promotions (
-        PromotionId INT IDENTITY(1,1) PRIMARY KEY,
-        Code VARCHAR(50) NOT NULL,
-        Description NVARCHAR(500) NULL,
-        DiscountAmount DECIMAL(18,2) NULL
-    );
-END
-
 -- Users
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Users]') AND type in (N'U'))
 BEGIN
@@ -141,7 +130,6 @@ BEGIN
         CONSTRAINT UQ_Orders_OrderCode UNIQUE (OrderCode),
         CONSTRAINT FK_Orders_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(UserId),
         CONSTRAINT FK_Orders_Addresses FOREIGN KEY (AddressId) REFERENCES dbo.Addresses(AddressId),
-        CONSTRAINT FK_Orders_Promotions FOREIGN KEY (PromotionId) REFERENCES dbo.Promotions(PromotionId)
     );
 END
 
@@ -220,22 +208,6 @@ BEGIN
         LineTotal DECIMAL(18,2) NOT NULL,
         CONSTRAINT FK_OrderItems_Orders FOREIGN KEY (OrderId) REFERENCES dbo.Orders(OrderId),
         CONSTRAINT FK_OrderItems_ProductVariants FOREIGN KEY (VariantId) REFERENCES dbo.ProductVariants(VariantId)
-    );
-END
-
--- Payments
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Payments]') AND type in (N'U'))
-BEGIN
-    CREATE TABLE dbo.Payments (
-        PaymentId BIGINT IDENTITY(1,1) PRIMARY KEY,
-        OrderId BIGINT NOT NULL,
-        Method VARCHAR(30) NULL,
-        GatewayTransactionId VARCHAR(100) NULL,
-        Amount DECIMAL(18,2) NOT NULL,
-        PaidAt DATETIME2 NULL,
-        Status TINYINT NULL,
-        ResponsePayload NVARCHAR(MAX) NULL,
-        CONSTRAINT FK_Payments_Orders FOREIGN KEY (OrderId) REFERENCES dbo.Orders(OrderId)
     );
 END
 
@@ -321,6 +293,26 @@ BEGIN
         ALTER TABLE dbo.Contacts ADD UpdatedBy INT NULL;
         ALTER TABLE dbo.Contacts ADD CONSTRAINT FK_Contacts_UpdatedBy FOREIGN KEY (UpdatedBy) REFERENCES dbo.Users(UserId);
     END
+END
+
+-- Sliders (homepage hero carousel)
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Sliders]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE dbo.Sliders (
+        SliderId INT IDENTITY(1,1) PRIMARY KEY,
+        Image VARCHAR(255) NOT NULL,
+        Title NVARCHAR(200) NULL,
+        Subtitle NVARCHAR(200) NULL,
+        LinkUrl NVARCHAR(500) NULL,
+        SortOrder INT NOT NULL DEFAULT 0,
+        IsActive BIT NOT NULL DEFAULT(1),
+        CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+        UpdatedAt DATETIME2 NULL,
+        CreatedBy INT NULL,
+        UpdatedBy INT NULL,
+        CONSTRAINT FK_Sliders_CreatedBy FOREIGN KEY (CreatedBy) REFERENCES dbo.Users(UserId),
+        CONSTRAINT FK_Sliders_UpdatedBy FOREIGN KEY (UpdatedBy) REFERENCES dbo.Users(UserId)
+    );
 END
 
 PRINT 'Tables created (if not existed)';

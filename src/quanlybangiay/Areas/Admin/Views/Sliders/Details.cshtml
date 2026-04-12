@@ -1,0 +1,65 @@
+@model quanlybangiay.Models.Slider
+@{
+    Layout = "~/Views/Shared/_ManageLayout.cshtml";
+    ViewData["Title"] = "Chi tiết Slider";
+}
+
+<div class="card mb-4">
+    <h2 class="card-header fw-bold py-3 mb-4">Chi tiết Slider</h2>
+    <div class="card-body">
+        <div class="mb-3">
+            <label class="form-label fw-bold">ID</label>
+            <div>@Model.SliderId</div>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Model.Image))
+        {
+            <div class="mb-3">
+                <label class="form-label fw-bold">Hình ảnh</label>
+                <div>
+                    <img src="@Model.Image" alt="Slider" style="max-width:500px;max-height:300px;" class="img-fluid rounded" />
+                </div>
+            </div>
+        }
+        <div class="mb-3">
+            <label class="form-label fw-bold">Tiêu đề</label>
+            <div>@(Model.Title ?? "—")</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Phụ đề</label>
+            <div>@(Model.Subtitle ?? "—")</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Liên kết</label>
+            <div>@(Model.LinkUrl ?? "—")</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Thứ tự</label>
+            <div>@Model.SortOrder</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Trạng thái</label>
+            <div>
+                <span class="badge @(Model.IsActive ? "bg-label-primary" : "bg-label-dark")">@(Model.IsActive ? "Hiển thị" : "Ẩn")</span>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Ngày tạo</label>
+            <div>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Ngày cập nhật</label>
+            <div>@(Model.UpdatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "—")</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Người tạo</label>
+            <div>@(Model.CreatedByUser?.FullName ?? Model.CreatedByUser?.Email ?? "—")</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Người cập nhật</label>
+            <div>@(Model.UpdatedByUser?.FullName ?? Model.UpdatedByUser?.Email ?? "—")</div>
+        </div>
+    </div>
+</div>
+
+<a asp-area="Admin" asp-controller="Sliders" asp-action="Edit" asp-route-id="@Model.SliderId" class="btn btn-secondary">Sửa</a>
+<a asp-area="Admin" asp-controller="Sliders" asp-action="Index" class="btn btn-outline-secondary">Quay lại</a>

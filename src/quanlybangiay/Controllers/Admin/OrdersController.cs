@@ -185,11 +185,6 @@ namespace quanlybangiay.Controllers.Admin
                 .Where(oi => oi.OrderId == id.Value)
                 .ToListAsync();
 
-            ViewBag.Payments = await _db.Payments
-                .Where(p => p.OrderId == id.Value)
-                .OrderByDescending(p => p.PaidAt)
-                .ToListAsync();
-
             return View(order);
         }
 

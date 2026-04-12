@@ -2,6 +2,7 @@
     ViewData["Title"] = "Trang chủ";
     var categories = ViewBag.Categories as List<Category> ?? new List<Category>();
     var bestSellers = ViewBag.BestSellers as List<Product> ?? new List<Product>();
+    var sliders = ViewBag.Sliders as List<Slider> ?? new List<Slider>();
     var featuredCategories = categories.Take(2).ToList();
     var featuredImages = new[] { "/images/men.jpg", "/images/women.jpg" };
 }
@@ -9,60 +10,62 @@
 <aside id="colorlib-hero">
     <div class="flexslider">
         <ul class="slides">
-            <li style="background-image: url('/images/img_bg_1.jpg');">
-                <div class="overlay"></div>
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-sm-6 offset-sm-3 text-center slider-text">
-                            <div class="slider-text-inner">
-                                <div class="desc">
-                                    <h1 class="head-1">Men's</h1>
-                                    <h2 class="head-2">Shoes</h2>
-                                    <h2 class="head-3">Collection</h2>
-                                    <p class="category"><span>Xu hướng giày mới</span></p>
-                                    <p><a asp-controller="Product" asp-action="Category" class="btn btn-primary">Mua sắm</a></p>
+            @if (sliders.Any())
+            {
+                @foreach (var slide in sliders)
+                {
+                    <li style="background-image: url('@slide.Image');">
+                        <div class="overlay"></div>
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-sm-6 offset-sm-3 text-center slider-text">
+                                    <div class="slider-text-inner">
+                                        <div class="desc">
+                                            @if (!string.IsNullOrWhiteSpace(slide.Title))
+                                            {
+                                                <h1 class="head-1">@slide.Title</h1>
+                                            }
+                                            @if (!string.IsNullOrWhiteSpace(slide.Subtitle))
+                                            {
+                                                <p class="category"><span>@slide.Subtitle</span></p>
+                                            }
+                                            @if (!string.IsNullOrWhiteSpace(slide.LinkUrl))
+                                            {
+                                                <p><a href="@slide.LinkUrl" class="btn btn-primary">Mua sắm</a></p>
+                                            }
+                                            else
+                                            {
+                                                <p><a href="/san-pham" class="btn btn-primary">Mua sắm</a></p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                }
+            }
+            else
+            {
+                <li style="background-image: url('/images/img_bg_1.jpg');">
+                    <div class="overlay"></div>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-sm-6 offset-sm-3 text-center slider-text">
+                                <div class="slider-text-inner">
+                                    <div class="desc">
+                                        <h1 class="head-1">Men's</h1>
+                                        <h2 class="head-2">Shoes</h2>
+                                        <h2 class="head-3">Collection</h2>
+                                        <p class="category"><span>Xu hướng giày mới</span></p>
+                                        <p><a href="/san-pham" class="btn btn-primary">Mua sắm</a></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </li>
-            <li style="background-image: url('/images/img_bg_2.jpg');">
-                <div class="overlay"></div>
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-sm-6 offset-sm-3 text-center slider-text">
-                            <div class="slider-text-inner">
-                                <div class="desc">
-                                    <h1 class="head-1">Huge</h1>
-                                    <h2 class="head-2">Sale</h2>
-                                    <h2 class="head-3"><strong class="font-weight-bold">50%</strong> Off</h2>
-                                    <p class="category"><span>Ưu đãi sandal &amp; dép</span></p>
-                                    <p><a asp-controller="Product" asp-action="Category" class="btn btn-primary">Mua sắm</a></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </li>
-            <li style="background-image: url('/images/img_bg_3.jpg');">
-                <div class="overlay"></div>
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-sm-6 offset-sm-3 text-center slider-text">
-                            <div class="slider-text-inner">
-                                <div class="desc">
-                                    <h1 class="head-1">New</h1>
-                                    <h2 class="head-2">Arrival</h2>
-                                    <h2 class="head-3">up to <strong class="font-weight-bold">30%</strong> off</h2>
-                                    <p class="category"><span>Giày nam nữ mới về</span></p>
-                                    <p><a asp-controller="Product" asp-action="Category" class="btn btn-primary">Mua sắm</a></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </li>
+                </li>
+            }
         </ul>
     </div>
 </aside>
@@ -84,11 +87,14 @@
             {
                 var cat = featuredCategories[i];
                 var bg = i < featuredImages.Length ? featuredImages[i] : "/images/men.jpg";
+                var fcUrl = !string.IsNullOrWhiteSpace(cat.Slug)
+                    ? $"/danh-muc/{cat.Slug}"
+                    : Url.Action("Category", "Product", new { id = cat.CategoryId });
                 <div class="col-sm-6 text-center">
                     <div class="featured">
-                        <a asp-controller="Product" asp-action="Category" asp-route-id="@cat.CategoryId" class="featured-img" style="background-image: url('@bg');"></a>
+                        <a href="@fcUrl" class="featured-img" style="background-image: url('@bg');"></a>
                         <div class="desc">
-                            <h2><a asp-controller="Product" asp-action="Category" asp-route-id="@cat.CategoryId">@cat.CategoryName</a></h2>
+                            <h2><a href="@fcUrl">@cat.CategoryName</a></h2>
                         </div>
                     </div>
                 </div>
@@ -116,13 +122,16 @@
                     : product.ThumbnailUrl;
                 var hasDiscount = product.DiscountPrice.HasValue && product.DiscountPrice.Value > 0
                     && product.DiscountPrice.Value < product.BasePrice;
+                var pdpUrl = !string.IsNullOrWhiteSpace(product.Slug)
+                    ? $"/san-pham/{product.Slug}"
+                    : Url.Action("Detail", "Product", new { id = product.ProductId });
                 <div class="col-lg-3 mb-4 text-center">
                     <div class="product-entry border">
-                        <a asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductId" class="prod-img">
+                        <a href="@pdpUrl" class="prod-img">
                             <img src="@thumb" class="img-fluid" alt="@product.ProductName">
                         </a>
                         <div class="desc">
-                            <h2><a asp-controller="Product" asp-action="Detail" asp-route-id="@product.ProductId">@product.ProductName</a></h2>
+                            <h2><a href="@pdpUrl">@product.ProductName</a></h2>
                             <span class="price">
                                 @if (hasDiscount)
                                 {
@@ -146,7 +155,7 @@
         </div>
         <div class="row">
             <div class="col-md-12 text-center">
-                <p><a asp-controller="Product" asp-action="Category" class="btn btn-primary btn-lg">Shop All Products</a></p>
+                <p><a href="/san-pham" class="btn btn-primary btn-lg">Tất cả sản phẩm</a></p>
             </div>
         </div>
     </div>

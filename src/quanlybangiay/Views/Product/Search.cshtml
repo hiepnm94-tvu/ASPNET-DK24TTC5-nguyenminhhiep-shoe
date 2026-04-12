@@ -12,7 +12,7 @@
         <div class="row">
             <div class="col">
                 <p class="bread">
-                    <span><a asp-controller="Home" asp-action="Index">Trang chủ</a></span> /
+                    <span><a href="/">Trang chủ</a></span> /
                     <span>Tìm kiếm</span>
                 </p>
             </div>
@@ -41,7 +41,7 @@
             <div class="row">
                 <div class="col-12 text-center py-5">
                     <p class="lead mb-4">Không tìm thấy sản phẩm nào.</p>
-                    <p><a asp-controller="Product" asp-action="Category" class="btn btn-primary">Xem tất cả sản phẩm</a></p>
+                    <p><a href="/san-pham" class="btn btn-primary">Xem tất cả sản phẩm</a></p>
                 </div>
             </div>
         }
@@ -50,13 +50,16 @@
             <div class="row row-pb-md">
                 @foreach (var p in Model)
                 {
+                    var spUrl = !string.IsNullOrWhiteSpace(p.Slug)
+                        ? $"/san-pham/{p.Slug}"
+                        : Url.Action("Detail", "Product", new { id = p.ProductId });
                     <div class="col-md-3 col-lg-3 mb-4 text-center">
                         <div class="product-entry border">
-                            <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.ProductId" class="prod-img">
+                            <a href="@spUrl" class="prod-img">
                                 <img src="@(p.ThumbnailUrl ?? "/images/no-image.png")" class="img-fluid" alt="@p.ProductName">
                             </a>
                             <div class="desc">
-                                <h2><a asp-controller="Product" asp-action="Detail" asp-route-id="@p.ProductId">@p.ProductName</a></h2>
+                                <h2><a href="@spUrl">@p.ProductName</a></h2>
                                 @if (p.DiscountPrice.HasValue && p.DiscountPrice.Value < p.BasePrice)
                                 {
                                     <span class="price">@p.DiscountPrice.Value.ToString("N0") đ</span>
@@ -80,7 +83,7 @@
                             <ul>
                                 @if (page > 1)
                                 {
-                                    <li><a href="/Product/Search?q=@Uri.EscapeDataString(searchQuery ?? "")&page=@(page-1)"><i class="ion-ios-arrow-back"></i></a></li>
+                                    <li><a href="/tim-kiem?q=@Uri.EscapeDataString(searchQuery ?? "")&page=@(page-1)"><i class="ion-ios-arrow-back"></i></a></li>
                                 }
                                 @for (var i = 1; i <= totalPages; i++)
                                 {
@@ -91,13 +94,13 @@
                                         }
                                         else
                                         {
-                                            <a href="/Product/Search?q=@Uri.EscapeDataString(searchQuery ?? "")&page=@i">@i</a>
+                                            <a href="/tim-kiem?q=@Uri.EscapeDataString(searchQuery ?? "")&page=@i">@i</a>
                                         }
                                     </li>
                                 }
                                 @if (page < totalPages)
                                 {
-                                    <li><a href="/Product/Search?q=@Uri.EscapeDataString(searchQuery ?? "")&page=@(page+1)"><i class="ion-ios-arrow-forward"></i></a></li>
+                                    <li><a href="/tim-kiem?q=@Uri.EscapeDataString(searchQuery ?? "")&page=@(page+1)"><i class="ion-ios-arrow-forward"></i></a></li>
                                 }
                             </ul>
                         </div>

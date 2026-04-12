@@ -1,0 +1,100 @@
+@model IEnumerable<quanlybangiay.Models.Post>
+@{
+    ViewData["Title"] = "Bài viết";
+    var page = ViewBag.Page is int pg ? pg : 1;
+    var totalPages = ViewBag.TotalPages is int tp ? tp : 0;
+}
+
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <p class="bread">
+                    <span><a href="/">Trang chủ</a></span> /
+                    <span>Bài viết</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="colorlib-product">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 offset-sm-2 text-center colorlib-heading colorlib-heading-sm">
+                <h2>Bài viết</h2>
+            </div>
+        </div>
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="row">
+                <div class="col-12 text-center py-5">
+                    <p class="lead mb-0">Chưa có bài viết nào.</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                @foreach (var post in Model)
+                {
+                    var thumb = string.IsNullOrWhiteSpace(post.ThumbnailUrl)
+                        ? "/images/no-image.png"
+                        : post.ThumbnailUrl;
+                    var postUrl = !string.IsNullOrWhiteSpace(post.Slug)
+                        ? $"/bai-viet/{post.Slug}"
+                        : Url.Action("Detail", "Post", new { id = post.PostId });
+                    <div class="col-md-4 mb-4">
+                        <div class="product-entry border" style="min-height:320px;">
+                            <a href="@postUrl" class="prod-img">
+                                <img src="@thumb" class="img-fluid" alt="@post.Title" style="height:200px;object-fit:cover;width:100%;">
+                            </a>
+                            <div class="desc p-3">
+                                <h2 style="font-size:18px;"><a href="@postUrl">@post.Title</a></h2>
+                                @if (!string.IsNullOrWhiteSpace(post.ShortDescription))
+                                {
+                                    <p class="text-muted" style="font-size:14px;">@(post.ShortDescription.Length > 100 ? post.ShortDescription.Substring(0, 100) + "..." : post.ShortDescription)</p>
+                                }
+                                <small class="text-muted">@(post.CreatedAt?.ToString("dd/MM/yyyy"))</small>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @if (totalPages > 1)
+            {
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <div class="block-27">
+                            <ul>
+                                @if (page > 1)
+                                {
+                                    <li><a href="/bai-viet?page=@(page - 1)"><i class="ion-ios-arrow-back"></i></a></li>
+                                }
+                                @for (var i = 1; i <= totalPages; i++)
+                                {
+                                    <li class="@(i == page ? "active" : "")">
+                                        @if (i == page)
+                                        {
+                                            <span>@i</span>
+                                        }
+                                        else
+                                        {
+                                            <a href="/bai-viet?page=@i">@i</a>
+                                        }
+                                    </li>
+                                }
+                                @if (page < totalPages)
+                                {
+                                    <li><a href="/bai-viet?page=@(page + 1)"><i class="ion-ios-arrow-forward"></i></a></li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

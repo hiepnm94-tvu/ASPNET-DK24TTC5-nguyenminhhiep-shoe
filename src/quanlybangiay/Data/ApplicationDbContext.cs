@@ -14,10 +14,10 @@ namespace quanlybangiay.Data
         public DbSet<ProductVariant> ProductVariants { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
-        public DbSet<Payment> Payments { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Setting> Settings { get; set; }
         public DbSet<Contact> Contacts { get; set; }
+        public DbSet<Slider> Sliders { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -67,12 +67,6 @@ namespace quanlybangiay.Data
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Payment>()
-                .HasOne(p => p.Order)
-                .WithMany()
-                .HasForeignKey(p => p.OrderId)
-                .OnDelete(DeleteBehavior.Cascade);
-
             modelBuilder.Entity<Post>()
                 .HasOne(p => p.CreatedByUser)
                 .WithMany()
@@ -101,6 +95,18 @@ namespace quanlybangiay.Data
                 .HasOne(c => c.UpdatedByUser)
                 .WithMany()
                 .HasForeignKey(c => c.UpdatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Slider>()
+                .HasOne(s => s.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(s => s.CreatedBy)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Slider>()
+                .HasOne(s => s.UpdatedByUser)
+                .WithMany()
+                .HasForeignKey(s => s.UpdatedBy)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

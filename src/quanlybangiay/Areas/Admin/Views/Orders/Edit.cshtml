@@ -3,10 +3,6 @@
 @{
     Layout = "~/Views/Shared/_ManageLayout.cshtml";
     ViewData["Title"] = "Cập nhật đơn hàng";
-
-    // Helper: render selected="selected" when matched, omit otherwise
-    string Sel(string? modelVal, string optVal) =>
-        (modelVal ?? "") == optVal ? "selected" : "";
 }
 
 <div class="card mb-4">

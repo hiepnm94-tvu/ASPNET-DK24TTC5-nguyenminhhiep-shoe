@@ -1,0 +1,74 @@
+@model quanlybangiay.Models.Post
+@{
+    ViewData["Title"] = Model.Title;
+    var recentPosts = ViewBag.RecentPosts as List<Post> ?? new List<Post>();
+}
+
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <p class="bread">
+                    <span><a href="/">Trang chủ</a></span> /
+                    <span><a href="/bai-viet">Bài viết</a></span> /
+                    <span>@Model.Title</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="colorlib-product">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                @if (!string.IsNullOrWhiteSpace(Model.ThumbnailUrl))
+                {
+                    <img src="@Model.ThumbnailUrl" class="img-fluid rounded mb-4" alt="@Model.Title" style="width:100%;max-height:400px;object-fit:cover;">
+                }
+                <h1 style="font-size:28px;margin-bottom:10px;">@Model.Title</h1>
+                <p class="text-muted mb-4">
+                    <i class="icon-calendar"></i> @(Model.CreatedAt?.ToString("dd/MM/yyyy"))
+                    @if (Model.CreatedByUser != null)
+                    {
+                        <text> | </text><i class="icon-user"></i><text> @(Model.CreatedByUser.FullName ?? Model.CreatedByUser.Email)</text>
+                    }
+                </p>
+
+                @if (!string.IsNullOrWhiteSpace(Model.ShortDescription))
+                {
+                    <p class="lead" style="font-size:16px;color:#666;">@Model.ShortDescription</p>
+                    <hr />
+                }
+
+                <div class="post-content">
+                    @Html.Raw(Model.Content)
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                @if (recentPosts.Any())
+                {
+                    <div class="sidebar-box">
+                        <h3 style="font-size:20px;margin-bottom:15px;">Bài viết gần đây</h3>
+                        <ul class="list-unstyled">
+                            @foreach (var rp in recentPosts)
+                            {
+                                var rpUrl = !string.IsNullOrWhiteSpace(rp.Slug)
+                                    ? $"/bai-viet/{rp.Slug}"
+                                    : Url.Action("Detail", "Post", new { id = rp.PostId });
+                                <li class="mb-3">
+                                    <a href="@rpUrl" style="text-decoration:none;color:#333;">
+                                        <strong>@rp.Title</strong>
+                                    </a>
+                                    <br />
+                                    <small class="text-muted">@(rp.CreatedAt?.ToString("dd/MM/yyyy"))</small>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

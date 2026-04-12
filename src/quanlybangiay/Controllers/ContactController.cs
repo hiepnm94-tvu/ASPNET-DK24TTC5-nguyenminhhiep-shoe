@@ -28,7 +28,7 @@ namespace quanlybangiay.Controllers
             if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(message))
             {
                 TempData["ErrorMessage"] = "Vui lòng điền đầy đủ thông tin bắt buộc.";
-                return RedirectToAction("Index");
+                return Redirect("/lien-he");
             }
 
             var contact = new Contact
@@ -47,7 +47,7 @@ namespace quanlybangiay.Controllers
             await _db.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi sớm nhất.";
-            return RedirectToAction("Index");
+            return Redirect("/lien-he");
         }
     }
 }

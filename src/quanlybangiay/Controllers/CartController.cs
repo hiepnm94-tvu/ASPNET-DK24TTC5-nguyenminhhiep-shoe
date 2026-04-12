@@ -78,7 +78,7 @@ namespace quanlybangiay.Controllers
             }
 
             SaveCart(cart);
-            return RedirectToAction("Index");
+            return Redirect("/gio-hang");
         }
 
         [HttpPost]
@@ -94,7 +94,7 @@ namespace quanlybangiay.Controllers
                     item.Quantity = quantity;
             }
             SaveCart(cart);
-            return RedirectToAction("Index");
+            return Redirect("/gio-hang");
         }
 
         [HttpPost]
@@ -103,7 +103,7 @@ namespace quanlybangiay.Controllers
             var cart = GetCart();
             cart.RemoveAll(c => c.VariantId == variantId);
             SaveCart(cart);
-            return RedirectToAction("Index");
+            return Redirect("/gio-hang");
         }
 
         [HttpGet]

@@ -13,7 +13,7 @@ namespace quanlybangiay.Controllers
             _db = db;
         }
 
-        public async Task<IActionResult> Category(int? id, int page = 1, int pageSize = 12)
+        public async Task<IActionResult> Category(string? slug, int? id, int page = 1, int pageSize = 12)
         {
             var categoriesQuery = _db.Categories.Where(c => c.IsActive == true);
             var categories = await categoriesQuery.OrderBy(c => c.CategoryName).ToListAsync();
@@ -23,9 +23,18 @@ namespace quanlybangiay.Controllers
                 .Where(p => p.Status == 1)
                 .AsQueryable();
 
-            if (id.HasValue && id > 0)
+            Models.Category? currentCategory = null;
+
+            if (!string.IsNullOrWhiteSpace(slug))
+            {
+                currentCategory = await _db.Categories.FirstOrDefaultAsync(c => c.Slug == slug && c.IsActive == true);
+                if (currentCategory != null)
+                    query = query.Where(p => p.CategoryId == currentCategory.CategoryId);
+            }
+            else if (id.HasValue && id > 0)
             {
                 query = query.Where(p => p.CategoryId == id.Value);
+                currentCategory = await _db.Categories.FindAsync(id.Value);
             }
 
             var totalCount = await query.CountAsync();
@@ -38,13 +47,10 @@ namespace quanlybangiay.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
-            var currentCategory = id.HasValue
-                ? await _db.Categories.FindAsync(id.Value)
-                : null;
-
             ViewBag.Categories = categories;
             ViewBag.CurrentCategory = currentCategory;
-            ViewBag.CategoryId = id;
+            ViewBag.CategoryId = currentCategory?.CategoryId ?? id;
+            ViewBag.CategorySlug = currentCategory?.Slug;
             ViewBag.Page = page;
             ViewBag.PageSize = pageSize;
             ViewBag.TotalPages = totalPages;
@@ -53,22 +59,36 @@ namespace quanlybangiay.Controllers
             return View(products);
         }
 
-        public async Task<IActionResult> Detail(int id)
+        public async Task<IActionResult> Detail(string? slug, int? id)
         {
-            var product = await _db.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(p => p.ProductId == id && p.Status == 1);
+            Models.Product? product = null;
+
+            if (!string.IsNullOrWhiteSpace(slug))
+            {
+                product = await _db.Products
+                    .Include(p => p.Category)
+                    .FirstOrDefaultAsync(p => p.Slug == slug && p.Status == 1);
+            }
+            else if (id.HasValue)
+            {
+                product = await _db.Products
+                    .Include(p => p.Category)
+                    .FirstOrDefaultAsync(p => p.ProductId == id.Value && p.Status == 1);
+
+                if (product != null && !string.IsNullOrWhiteSpace(product.Slug))
+                    return RedirectToRoutePermanent("product-detail", new { slug = product.Slug });
+            }
 
             if (product == null)
                 return NotFound();
 
             var variants = await _db.ProductVariants
-                .Where(v => v.ProductId == id && v.StockQty > 0)
+                .Where(v => v.ProductId == product.ProductId && v.StockQty > 0)
                 .OrderBy(v => v.SizeValue)
                 .ToListAsync();
 
             var relatedProducts = await _db.Products
-                .Where(p => p.CategoryId == product.CategoryId && p.ProductId != id && p.Status == 1)
+                .Where(p => p.CategoryId == product.CategoryId && p.ProductId != product.ProductId && p.Status == 1)
                 .Take(4)
                 .ToListAsync();
 

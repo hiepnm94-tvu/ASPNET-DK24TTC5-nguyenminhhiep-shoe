@@ -8047,7 +8047,7 @@ h1, h2, h3, h4, h5,
         width: 60px; } }
   .product-cart .display-tc, .product-name .display-tc {
     display: table-cell;
-    vertical-align: middle;
+    vertical-align: top;
     height: 100px;
     width: 100%; }
     .product-cart .display-tc h3, .product-name .display-tc h3 {
