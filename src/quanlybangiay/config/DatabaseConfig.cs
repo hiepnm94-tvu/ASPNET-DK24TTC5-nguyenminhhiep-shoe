@@ -20,8 +20,7 @@ namespace quanlybangiay.Config
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
             // Register DbContext with SQL Server provider. To use a different provider (e.g. Npgsql), change this line.
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
             return services;
         }
