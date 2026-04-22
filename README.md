@@ -1,6 +1,6 @@
 # Xây dựng Website Bán Giày — ASP.NET Core MVC
 
-> Đồ án môn học Chuyên đề ASP.NET — Khoa Kỹ thuật và Công nghệ, Trường Đại học Trà Vinh.
+> Đồ án môn học Chuyên đề ASP.NET
 
 ![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)
 ![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-MVC-512BD4)
@@ -133,8 +133,8 @@ Truy cập: `https://localhost:{port}/Account/Login`
 
 | Trường | Giá trị |
 |---|---|
-| Email | `admin@example.com` |
-| Password | `Admin@123` |
+| Email | `hiepnm071194@tvu-onschool.edu.vn` |
+| Password | `Hiep@123` |
 
 > ⚠️ **Lưu ý bảo mật:** Đây là tài khoản mẫu chỉ dùng cho môi trường phát triển. Vui lòng đổi mật khẩu ngay sau khi đăng nhập lần đầu và không sử dụng trên môi trường production.
 
@@ -178,5 +178,5 @@ src/quanlybangiay/
 
 ## Tác giả
 
-- **Nguyễn Minh Hiệp** — Lớp DK24TTC5, Khoa Kỹ thuật và Công nghệ, Trường Đại học Trà Vinh
+- **Nguyễn Minh Hiệp** — Lớp DK24TTC5
 - Email: minhhiep.q@gmail.com
