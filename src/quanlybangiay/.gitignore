@@ -3,5 +3,3 @@
 ##
 ## Get latest from `dotnet new gitignore`
 .vs/*
-
-wwwroot/uploads/*
